@@ -108,7 +108,9 @@ Public checks exposed an import race: an initial URL document completing after a
 
 The staged secret scan reported no findings. The refreshed local archive contains 42 files, the comparison/locale declarations and session/comparison styles, with no demo server, browser fixtures or bundled fonts. Its manifest remains private.
 
-GitHub CI run `38314545349` for source commit `ea1c1ce` was blocked before any step started. Its check annotation again reports an account payment failure or spending limit requiring review in Billing & plans. Local verification passed; no successful GitHub run or billing change is claimed.
+GitHub CI runs `38314545349` for commit `ea1c1ce` and `38315239497` for corrected source commit `dc42f5f` were blocked before any step started. Their check annotations again report an account payment failure or spending limit requiring review in Billing & plans. Local verification passed; no successful GitHub run or billing change is claimed.
+
+Railway deployment `245f9010-2c67-4e43-b2ee-88500690ca70` reached **SUCCESS** on the same project, production environment and service. Thirty selected browser journeys passed against the public service on Chromium and WebKit iPhone: comparison/locale/session actions, all three import-race regressions, responsive layouts, navigation and real GET/POST. Additional checks on both browsers verified the English comparison screen, its actual dark stylesheet, lack of horizontal overflow and absence of runtime errors. Public `/`, `/demo`, `/compare`, `/compare/`, `/health`, `/openapi.json` and `/api/products` returned HTTP 200; the page references the verified corrected production bundle.
 
 ## Distribution and remaining scope
 
