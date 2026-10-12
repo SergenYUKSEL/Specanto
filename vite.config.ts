@@ -5,7 +5,8 @@ export default defineConfig({
   plugins: [react()],
   build: {
     lib: { entry: 'src/index.ts', formats: ['es'], fileName: 'specanto', cssFileName: 'styles' },
-    rolldownOptions: { external: [/^react(?:\/.*)?$/, /^react-dom(?:\/.*)?$/] },
+    // Preserve runtime package conditions so Node/SSR imports do not select DOM-only Markdown code.
+    rolldownOptions: { external: [/^react(?:\/.*)?$/, /^react-dom(?:\/.*)?$/, 'react-markdown', 'yaml'] },
     sourcemap: true,
   },
 });

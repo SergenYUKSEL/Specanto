@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import Markdown from 'react-markdown';
 import { Icon } from './Icon';
+import { describeRequestTimeout, resolveRequestTimeout } from './request-timeout';
 import { buildRequest, exampleForSchema, httpTransport, loadSpec, parseSpec, searchOperations, toCurl } from '../core';
 import type { ApiResponse, NormalizedSpec, Operation, Parameter, PreparedRequest, RequestResult, Schema, Transport } from '../core/types';
 
@@ -11,6 +12,10 @@ export type ApiReferenceProps = SpecSource & {
   colorMode?: 'light' | 'dark' | 'system';
   accentColor?: string;
   fontFamily?: string;
+  monoFontFamily?: string;
+  logo?: ReactNode;
+  /** Maximum request duration in milliseconds. Integer from 100 to 300000; default 45000. */
+  requestTimeoutMs?: number;
   transport?: Transport;
   transportMode?: 'http' | 'simulation';
 };
@@ -155,8 +160,9 @@ function OperationDocs({ operation, apiTitle, idPrefix, onNotice }: { operation:
   </article>;
 }
 
-function RequestPanel({ operation, sourceUrl, transport, transportLabel, credentials, setCredentials, idPrefix, onNotice }: {
+function RequestPanel({ operation, sourceUrl, transport, transportLabel, credentials, setCredentials, idPrefix, onNotice, requestTimeoutMs }: {
   operation: Operation; sourceUrl?: string; transport: Transport; transportLabel: string; credentials: Credentials; idPrefix: string;
+  requestTimeoutMs?: number;
   setCredentials: (credentials: Credentials) => void; onNotice: (notice: string) => void;
 }) {
   const [serverUrl, setServerUrl] = useState(operation.servers[0]?.url ?? '/');
@@ -170,6 +176,9 @@ function RequestPanel({ operation, sourceUrl, transport, transportLabel, credent
   const [responseView, setResponseView] = useState<'body' | 'headers'>('body');
   const controller = useRef<AbortController | null>(null);
   const mounted = useRef(true);
+  let timeoutMs = resolveRequestTimeout(undefined);
+  let timeoutError = '';
+  try { timeoutMs = resolveRequestTimeout(requestTimeoutMs); } catch (cause) { timeoutError = message(cause); }
   const baseUrl = sourceUrl;
   let origin = '';
   let destination: string;
@@ -192,19 +201,21 @@ function RequestPanel({ operation, sourceUrl, transport, transportLabel, credent
   const requirement = operation.security[authAlternative] ?? {};
   const authNames = Object.keys(requirement);
   const send = async () => {
+    if (controller.current) return;
+    if (timeoutError) { setError(timeoutError); return; }
     let request: PreparedRequest;
     try { request = buildRequest(operation, requestInput); } catch (cause) { setError(message(cause)); return; }
     const abort = new AbortController();
     controller.current = abort;
     setPending(true); setError(''); setResult(null);
     let timedOut = false;
-    const timer = setTimeout(() => { timedOut = true; abort.abort(); }, 45_000);
+    const timer = setTimeout(() => { timedOut = true; abort.abort(); }, timeoutMs);
     const aborted = new Promise<never>((_, reject) => abort.signal.addEventListener('abort', () => reject(new Error('aborted')), { once: true }));
     try {
       const response = await Promise.race([transport(request, abort.signal), aborted]);
       if (mounted.current && !abort.signal.aborted) { setResult(response); setResponseView('body'); }
     } catch (cause) {
-      if (mounted.current) setError(abort.signal.aborted ? timedOut ? 'Le serveur n’a pas répondu sous 45 secondes. Réessayez ou vérifiez votre connexion.' : 'La requête a été annulée. Une annulation ne garantit pas l’absence d’effet côté serveur.' : transportLabel === 'HTTP réel' ? `La requête n’a pas abouti. ${message(cause)} Vérifiez le serveur, votre connexion et les règles CORS de l’API.` : `Le transport n’a pas renvoyé de réponse. ${message(cause)}`);
+      if (mounted.current) setError(abort.signal.aborted ? timedOut ? `Le serveur n’a pas répondu sous ${describeRequestTimeout(timeoutMs)}. Réessayez ou vérifiez votre connexion.` : 'La requête a été annulée. Une annulation ne garantit pas l’absence d’effet côté serveur.' : transportLabel === 'HTTP réel' ? `La requête n’a pas abouti. ${message(cause)} Vérifiez le serveur, votre connexion et les règles CORS de l’API.` : `Le transport n’a pas renvoyé de réponse. ${message(cause)}`);
     } finally { clearTimeout(timer); if (mounted.current) setPending(false); controller.current = null; }
   };
   const displayBody = result ? (() => { try { return json(JSON.parse(result.body)); } catch { return result.body; } })() : '';
@@ -231,8 +242,8 @@ function RequestPanel({ operation, sourceUrl, transport, transportLabel, credent
       })}
       {operation.requestBody && <div className="sp-request-body"><div className="sp-editor-heading"><label htmlFor={`${idPrefix}-json-body`}>Corps</label><span>{operation.requestBody.mediaType}</span><button type="button" className="sp-text-button" onClick={() => { setBody(json(example(operation.requestBody?.schema, operation.requestBody?.example))); setError(''); }}>Réinitialiser</button></div><textarea id={`${idPrefix}-json-body`} className="sp-json-editor" value={body} onChange={(event) => setBody(event.target.value)} spellCheck={false} autoComplete="off" aria-label="Corps JSON de la requête" /></div>}
       {operation.unsupported.length > 0 && <p className="sp-notice">Cette route utilise des paramètres non pris en charge. Consultez les notes dans la documentation.</p>}
-      <div className="sp-send-row"><button type="submit" className="sp-send" disabled={pending || operation.unsupported.length > 0}>{pending ? <><span className="sp-spinner" aria-hidden="true" />Envoi en cours…</> : <>Envoyer la requête<Icon name="arrow" /></>}</button>{pending && <button type="button" className="sp-cancel" onClick={() => controller.current?.abort()}>Annuler</button>}</div>
-      {error && <div className="sp-request-error" role="alert">{error}</div>}
+      <div className="sp-send-row"><button type="submit" className="sp-send" disabled={pending || Boolean(timeoutError) || operation.unsupported.length > 0}>{pending ? <><span className="sp-spinner" aria-hidden="true" />Envoi en cours…</> : <>Envoyer la requête<Icon name="arrow" /></>}</button>{pending && <button type="button" className="sp-cancel" onClick={() => controller.current?.abort()}>Annuler</button>}</div>
+      {(timeoutError || error) && <div className="sp-request-error" role="alert">{timeoutError || error}</div>}
     </form>
     {prepared && <details className="sp-curl"><summary>Requête cURL<span>sans secrets</span></summary><CodeBlock value={toCurl(prepared)} label="Requête cURL sans secrets" onNotice={onNotice} /></details>}
     <section className="sp-real-response" aria-label={transportLabel === 'HTTP réel' ? 'Réponse HTTP réelle' : transportLabel === 'Simulation' ? 'Réponse simulée' : 'Résultat du transport personnalisé'} aria-live="polite"><div className="sp-real-response-heading"><h3>Réponse</h3>{result && <div className="sp-response-meta"><span className={result.status < 400 ? 'sp-response-ok' : 'sp-response-failed'}>{result.status} {result.statusText}</span><span>{Math.round(result.duration)} ms</span></div>}</div>
@@ -292,7 +303,7 @@ export function ApiReference(props: ApiReferenceProps) {
   const groups = useMemo(() => Array.from(new Set(operations.map((operation) => operation.tags[0] ?? 'Opérations'))).map((tag) => ({ tag, operations: operations.filter((operation) => (operation.tags[0] ?? 'Opérations') === tag) })), [operations]);
   const operation = spec?.operations.find((item) => item.id === selectedId) ?? spec?.operations[0];
   const dark = mode === 'dark' || mode === 'system' && systemDark;
-  const styles = { ...(props.accentColor ? { '--sp-accent': props.accentColor } : {}), ...(props.fontFamily ? { '--sp-font': props.fontFamily } : {}) } as CSSProperties;
+  const styles = { ...(props.accentColor ? { '--sp-accent': props.accentColor } : {}), ...(props.fontFamily ? { '--sp-font': props.fontFamily } : {}), ...(props.monoFontFamily ? { '--sp-mono': props.monoFontFamily } : {}) } as CSSProperties;
   const navigate = (id: string) => { setSelectedId(id); setOverview(false); setNavOpen(false); window.history.replaceState(null, '', operationHash(id)); };
   const importFile = async (file?: File) => {
     if (!file) return;
@@ -300,9 +311,9 @@ export function ApiReference(props: ApiReferenceProps) {
     if (fileInput.current) fileInput.current.value = '';
   };
   return <div className="sp-reference" data-color-mode={dark ? 'dark' : 'light'} data-theme={props.theme ?? 'editorial'} style={styles}>
-    <div className="sp-mobile-bar"><span className="sp-mobile-wordmark">specanto<Icon name="asterisk" size={19} /></span><button type="button" onClick={() => setNavOpen(!navOpen)} aria-expanded={navOpen} aria-controls={`${idPrefix}-navigation`} aria-label={navOpen ? 'Fermer la navigation' : 'Ouvrir la navigation'}><Icon name={navOpen ? 'close' : 'menu'} /><span>Navigation</span></button></div>
+    <div className="sp-mobile-bar"><span className={`sp-mobile-wordmark ${props.logo !== undefined ? 'sp-custom-logo' : ''}`}>{props.logo !== undefined ? props.logo : <>specanto<Icon name="asterisk" size={19} /></>}</span><button type="button" onClick={() => setNavOpen(!navOpen)} aria-expanded={navOpen} aria-controls={`${idPrefix}-navigation`} aria-label={navOpen ? 'Fermer la navigation' : 'Ouvrir la navigation'}><Icon name={navOpen ? 'close' : 'menu'} /><span>Navigation</span></button></div>
     <nav id={`${idPrefix}-navigation`} className={`sp-navigation ${navOpen ? 'sp-navigation-open' : ''}`} aria-label="Navigation de l’API">
-      <div className="sp-brand"><a href="/" className="sp-wordmark" aria-label="Specanto, accueil">specanto<Icon name="asterisk" size={27} /></a><div className="sp-api-name"><span>{props.title ?? spec?.title ?? 'Référence API'}</span>{spec && <span className="sp-version">v{spec.version}</span>}</div></div>
+      <div className="sp-brand">{props.logo !== undefined ? <div className="sp-wordmark sp-custom-logo">{props.logo}</div> : <a href="/" className="sp-wordmark" aria-label="Specanto, accueil">specanto<Icon name="asterisk" size={27} /></a>}<div className="sp-api-name"><span>{props.title ?? spec?.title ?? 'Référence API'}</span>{spec && <span className="sp-version">v{spec.version}</span>}</div></div>
       <div className="sp-search"><Icon name="search" size={16} /><input ref={search} type="search" placeholder="Rechercher une route" aria-label="Rechercher une route" value={query} onChange={(event) => setQuery(event.target.value)} /><kbd aria-label="Commande K"><Icon name="command" size={10} /> K</kbd></div>
       <div className="sp-nav-scroll"><button type="button" className={`sp-overview-link ${overview ? 'sp-nav-active' : ''}`} onClick={() => { setOverview(true); setNavOpen(false); }}>Introduction<Icon name="arrow" size={15} /></button>
         {groups.map((group) => <div className="sp-nav-group" key={group.tag}><h2>{group.tag}</h2>{group.operations.map((item) => <a href={operationHash(item.id)} key={item.id} onClick={(event) => { event.preventDefault(); navigate(item.id); }} className={`sp-operation-link ${selectedId === item.id && !overview ? 'sp-nav-active' : ''}`} aria-current={selectedId === item.id && !overview ? 'page' : undefined}><Method method={item.method} /><span>{item.summary}</span></a>)}</div>)}
@@ -310,7 +321,7 @@ export function ApiReference(props: ApiReferenceProps) {
       </div>
       <div className="sp-nav-bottom"><button type="button" className="sp-import-button" onClick={() => fileInput.current?.click()}><Icon name="upload" size={16} />Importer une spécification</button><input className="sp-sr-only" ref={fileInput} type="file" accept=".json,.yaml,.yml,application/json,application/yaml,text/yaml" aria-label="Importer un fichier OpenAPI JSON ou YAML" onChange={(event) => { void importFile(event.target.files?.[0]); }} />{importError && <p className="sp-import-error" role="alert">{importError}</p>}<div className="sp-nav-footnote"><span>OpenAPI {spec ? '3.1.x' : ''}</span><button type="button" className="sp-theme-toggle" onClick={() => setMode(dark ? 'light' : 'dark')} aria-label={dark ? 'Activer le thème clair' : 'Activer le thème sombre'} title={dark ? 'Thème clair' : 'Thème sombre'}><Icon name={dark ? 'sun' : 'moon'} size={17} /></button></div></div>
     </nav>
-    {loading ? <main className="sp-state"><span className="sp-spinner" aria-hidden="true" /><h1>Chargement de la spécification</h1><p>Préparation de la documentation…</p></main> : loadError ? <main className="sp-state sp-state-error" role="alert"><h1>Cette spécification ne peut pas être ouverte.</h1><p>{loadError}</p><button type="button" onClick={() => fileInput.current?.click()}>Importer un fichier OpenAPI</button></main> : !spec?.operations.length ? <main className="sp-state"><h1>Aucune route documentée.</h1><p>Ajoutez des opérations dans la section paths de votre spécification OpenAPI.</p><button type="button" onClick={() => fileInput.current?.click()}>Importer une autre spécification</button></main> : overview ? <main className="sp-overview sp-documentation"><div className="sp-breadcrumb">Référence API <span aria-hidden="true">/</span> Introduction</div><h1>{props.title ?? spec.title}</h1><p className="sp-overview-version">Version {spec.version}</p><Prose>{spec.description || 'Explorez les routes, consultez leurs schémas et envoyez une requête depuis la documentation.'}</Prose><section className="sp-doc-section"><div className="sp-section-heading"><h2>Explorer l’API</h2><span>{spec.operations.length} routes</span></div>{spec.operations.map((item) => <button className="sp-overview-operation" type="button" key={item.id} onClick={() => navigate(item.id)}><Method method={item.method} /><code>{item.path}</code><span>{item.summary}</span><Icon name="arrow" size={18} /></button>)}</section>{spec.warnings.length > 0 && <details className="sp-warnings"><summary>Notes de la spécification ({spec.warnings.length})</summary><ul>{spec.warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul></details>}</main> : operation ? <main className="sp-workspace"><OperationDocs key={`docs:${specRevision}:${operation.id}`} operation={operation} apiTitle={props.title ?? spec.title} idPrefix={idPrefix} onNotice={setNotice} /><RequestPanel key={`request:${specRevision}:${operation.id}`} operation={operation} sourceUrl={spec.sourceUrl} transport={props.transport ?? httpTransport} transportLabel={props.transportMode === 'simulation' ? 'Simulation' : props.transportMode === 'http' || !props.transport || props.transport === httpTransport ? 'HTTP réel' : 'Transport personnalisé'} credentials={credentials} setCredentials={setCredentials} idPrefix={idPrefix} onNotice={setNotice} /></main> : null}
+    {loading ? <main className="sp-state"><span className="sp-spinner" aria-hidden="true" /><h1>Chargement de la spécification</h1><p>Préparation de la documentation…</p></main> : loadError ? <main className="sp-state sp-state-error" role="alert"><h1>Cette spécification ne peut pas être ouverte.</h1><p>{loadError}</p><button type="button" onClick={() => fileInput.current?.click()}>Importer un fichier OpenAPI</button></main> : !spec?.operations.length ? <main className="sp-state"><h1>Aucune route documentée.</h1><p>Ajoutez des opérations dans la section paths de votre spécification OpenAPI.</p><button type="button" onClick={() => fileInput.current?.click()}>Importer une autre spécification</button></main> : overview ? <main className="sp-overview sp-documentation"><div className="sp-breadcrumb">Référence API <span aria-hidden="true">/</span> Introduction</div><h1>{props.title ?? spec.title}</h1><p className="sp-overview-version">Version {spec.version}</p><Prose>{spec.description || 'Explorez les routes, consultez leurs schémas et envoyez une requête depuis la documentation.'}</Prose><section className="sp-doc-section"><div className="sp-section-heading"><h2>Explorer l’API</h2><span>{spec.operations.length} routes</span></div>{spec.operations.map((item) => <button className="sp-overview-operation" type="button" key={item.id} onClick={() => navigate(item.id)}><Method method={item.method} /><code>{item.path}</code><span>{item.summary}</span><Icon name="arrow" size={18} /></button>)}</section>{spec.warnings.length > 0 && <details className="sp-warnings"><summary>Notes de la spécification ({spec.warnings.length})</summary><ul>{spec.warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul></details>}</main> : operation ? <main className="sp-workspace"><OperationDocs key={`docs:${specRevision}:${operation.id}`} operation={operation} apiTitle={props.title ?? spec.title} idPrefix={idPrefix} onNotice={setNotice} /><RequestPanel key={`request:${specRevision}:${operation.id}`} operation={operation} sourceUrl={spec.sourceUrl} transport={props.transport ?? httpTransport} transportLabel={props.transportMode === 'simulation' ? 'Simulation' : props.transportMode === 'http' || !props.transport || props.transport === httpTransport ? 'HTTP réel' : 'Transport personnalisé'} credentials={credentials} setCredentials={setCredentials} idPrefix={idPrefix} onNotice={setNotice} requestTimeoutMs={props.requestTimeoutMs} /></main> : null}
     <div className="sp-sr-only" role="status" aria-live="polite" aria-atomic="true">{notice}</div>
   </div>;
 }

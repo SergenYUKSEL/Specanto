@@ -57,7 +57,9 @@
 .sp-reference .sp-navigation { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; border-right: 1px solid var(--sp-rule); padding: 32px 20px 16px; min-width: 0; }
 .sp-reference .sp-brand { padding: 0 4px; }
 .sp-reference .sp-wordmark { display: inline-flex; align-items: center; font-size: 42px; line-height: 1.08; font-weight: 650; letter-spacing: -.065em; text-decoration: none; }
-.sp-reference .sp-wordmark > svg { color: var(--sp-accent); flex-shrink: 0; margin-left: 3px; transform: translateY(-7px); }
+.sp-reference .sp-wordmark:not(.sp-custom-logo) > svg { color: var(--sp-accent); flex-shrink: 0; margin-left: 3px; transform: translateY(-7px); }
+.sp-reference .sp-custom-logo { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.sp-reference .sp-custom-logo img, .sp-reference .sp-custom-logo svg { max-width: 100%; max-height: 48px; object-fit: contain; }
 .sp-reference .sp-api-name { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 20px; font-size: 12px; font-weight: 550; }
 .sp-reference .sp-api-name > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sp-reference .sp-version { font: 11px var(--sp-mono); color: var(--sp-muted); border: 1px solid var(--sp-rule); padding: 3px 5px; white-space: nowrap; }
@@ -272,7 +274,9 @@
   .sp-reference { display: block; min-width: 0; }
   .sp-reference .sp-mobile-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--sp-rule); padding: 17px 20px; }
   .sp-reference .sp-mobile-wordmark { font-size: 28px; font-weight: 650; letter-spacing: -.065em; }
-  .sp-reference .sp-mobile-wordmark > svg { color: var(--sp-accent); display: inline-block; vertical-align: middle; transform: translateY(-4px); margin-left: 2px; }
+  .sp-reference .sp-mobile-wordmark:not(.sp-custom-logo) > svg { color: var(--sp-accent); display: inline-block; vertical-align: middle; transform: translateY(-4px); margin-left: 2px; }
+  .sp-reference .sp-mobile-wordmark.sp-custom-logo { display: inline-flex; align-items: center; }
+  .sp-reference .sp-mobile-wordmark.sp-custom-logo img, .sp-reference .sp-mobile-wordmark.sp-custom-logo svg { max-height: 36px; }
   .sp-reference .sp-mobile-bar > button { display: flex; align-items: center; gap: 8px; border: 0; background: transparent; font-size: 11px; padding: 7px 0 7px 7px; }
   .sp-reference .sp-navigation { display: none; position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--sp-rule); padding: 20px; }
   .sp-reference .sp-navigation-open { display: flex; }
