@@ -17,7 +17,7 @@ La comparaison lit chaque fichier localement, avec une limite de 2 Mio par docum
 
 L’historique et les favoris sont remis à zéro lors d’un import ou d’un rechargement. Ouvrir une entrée revient à la documentation de l’opération ; aucune requête n’est rejouée. Les snippets comprennent les corps et paramètres actuels, même lorsque les en-têtes secrets sont masqués.
 
-Les 224 tests unitaires et d’intégration, les 106 contrôles Chromium/WebKit mobile contre le build de production et les consommateurs empaquetés React 18.2/19.3 passent. Le package reste privé et non publié sur npm ; la licence du projet reste à choisir.
+Les 224 tests unitaires et d’intégration, les 112 contrôles Chromium/WebKit mobile contre le build de production et les consommateurs empaquetés React 18.2/19.3 passent. Le package reste privé et non publié sur npm ; la licence du projet reste à choisir.
 
 ## Extensions selon les demandes d'intégration
 

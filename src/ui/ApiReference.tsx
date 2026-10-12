@@ -311,26 +311,36 @@ function ApiReferenceContent(props: ApiReferenceProps) {
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const sessionScope = useRef(0);
   const sessionMounted = useRef(true);
+  const sourceRevision = useRef(0);
+  const importRevision = useRef(0);
+  const sourceController = useRef<AbortController | null>(null);
   const activeScope = sessionScope.current;
   const record = (entry: HistoryEntry) => { if (sessionMounted.current && sessionScope.current === activeScope) setHistory(previous => appendHistory(previous, entry)); };
   const search = useRef<HTMLInputElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const applySpec = (next: NormalizedSpec) => {
     sessionScope.current++; setHistory([]); setFavoriteIds([]);
-    setSpec(next); setLoadError(null); setLoading(false); setQuery(''); setOverview(false); setCredentials(initialCredentials); setSpecRevision((revision) => revision + 1); setImportError(null);
+    setSpec(next); setLoadError(null); setLoading(false); setQuery(''); setOverview(false); setCredentials(initialCredentials); setSpecRevision((revision) => revision + 1);
     const hashId = readOperationHash();
     setSelectedId(next.operations.some((item) => item.id === hashId) ? hashId : (next.operations.find((item) => item.method === 'POST' && item.path === '/orders') ?? next.operations[0])?.id ?? '');
   };
   useEffect(() => {
     const abort = new AbortController();
+    const revision = ++sourceRevision.current;
+    importRevision.current++;
+    sourceController.current = abort;
+    const current = () => !abort.signal.aborted && sourceRevision.current === revision;
     sessionScope.current++; setHistory([]); setFavoriteIds([]);
-    setLoading(true); setLoadError(null); setSpec(null); setCredentials(initialCredentials);
+    setLoading(true); setLoadError(null); setSpec(null); setCredentials(initialCredentials); setImportError(null);
     if (props.specUrl !== undefined) {
-      void loadSpec(props.specUrl, abort.signal).then((next) => { if (!abort.signal.aborted) applySpec(next); }).catch((cause: unknown) => { if (!abort.signal.aborted) { setLoadError(cause); setLoading(false); } });
+      void loadSpec(props.specUrl, abort.signal).then((next) => { if (current()) applySpec(next); }).catch((cause: unknown) => { if (current()) { setLoadError(cause); setLoading(false); } });
     } else {
       try { applySpec(parseSpec(props.spec)); } catch (cause) { setLoadError(cause); setLoading(false); }
     }
-    return () => abort.abort();
+    return () => {
+      abort.abort();
+      if (sourceController.current === abort) sourceController.current = null;
+    };
   }, [props.spec, props.specUrl]);
   useEffect(() => { setMode(props.colorMode ?? 'light'); }, [props.colorMode]);
   useEffect(() => { sessionMounted.current = true; return () => { sessionMounted.current = false; }; }, []);
@@ -356,8 +366,19 @@ function ApiReferenceContent(props: ApiReferenceProps) {
   const navigate = (id: string) => { setSelectedId(id); setOverview(false); setNavOpen(false); window.history.replaceState(null, '', operationHash(id)); };
   const importFile = async (file?: File) => {
     if (!file) return;
-    try { applySpec(parseSpec(await file.text())); setSelectedProfileId(null); setNotice(t.fileImported(file.name)); } catch (cause) { setImportError(cause); }
+    const revision = ++importRevision.current;
+    const source = sourceRevision.current;
+    const current = () => sessionMounted.current && importRevision.current === revision && sourceRevision.current === source;
+    // Clear the captured input now; an obsolete read must not clear a newer selection.
     if (fileInput.current) fileInput.current.value = '';
+    try {
+      const text = await file.text();
+      if (!current()) return;
+      const next = parseSpec(text);
+      // A successful local import takes priority over an outstanding URL source.
+      sourceRevision.current++; sourceController.current?.abort(); sourceController.current = null;
+      applySpec(next); setImportError(null); setSelectedProfileId(null); setNotice(t.fileImported(file.name));
+    } catch (cause) { if (current()) setImportError(cause); }
   };
   return <div className="sp-reference" lang={locale} data-color-mode={dark ? 'dark' : 'light'} data-theme={props.theme ?? 'editorial'} style={styles}>
     <div className="sp-mobile-bar"><span className={`sp-mobile-wordmark ${props.logo !== undefined ? 'sp-custom-logo' : ''}`}>{props.logo !== undefined ? props.logo : <>specanto<Icon name="asterisk" size={19} /></>}</span><button type="button" onClick={() => setNavOpen(!navOpen)} aria-expanded={navOpen} aria-controls={`${idPrefix}-navigation`} aria-label={navOpen ? t.closeNavigation : t.openNavigation}><Icon name={navOpen ? 'close' : 'menu'} /><span>{t.navigation}</span></button></div>

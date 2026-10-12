@@ -72,7 +72,7 @@ test('records only request metadata and opens history without sending a request 
   page.on('request', request => { if (new URL(request.url()).pathname === '/api/orders') calls++; });
   await page.goto('/demo');
   await page.getByRole('button', { name: 'Envoyer la requête', exact: true }).click();
-  await expect(page.getByRole('region', { name: 'Réponse HTTP réelle' })).toContainText('201 Created');
+  await expect(page.getByRole('region', { name: 'Réponse HTTP réelle' }).locator('.sp-response-meta')).toContainText('201');
   await page.keyboard.press('Control+k');
   await page.locator('.sp-session-panel > summary').click();
   const panel = page.locator('.sp-session-panel');

@@ -2,7 +2,7 @@
 
 Status checked against the current code and verification results on 13 October 2026. The functional MVP, integration options and all six proposed feature additions are implemented in the repository. Remaining distribution decisions are listed separately from shipped features.
 
-Verification: 224 unit/integration tests, 106 Chromium/mobile WebKit checks against the production build, and the React 18.2/19.3 packaged consumer checks passed.
+Verification: 224 unit/integration tests, 112 Chromium/mobile WebKit checks against the production build, and the React 18.2/19.3 packaged consumer checks passed.
 
 ## Delivered first slice
 
@@ -12,7 +12,7 @@ Verification: 224 unit/integration tests, 106 Chromium/mobile WebKit checks agai
 - [x] Bearer and API-key header construction, memory-only credentials, origin binding and redacted cURL.
 - [x] Responsive operation screen, light/dark themes and SVG icons.
 - [x] Fictional Atelier API, stateless demo server, public showcase and Railway CLI deployment.
-- [x] 224 unit/integration tests, 106 Chromium/mobile WebKit checks, and React 18.2/19.3 packaged consumers with strict TypeScript verification.
+- [x] 224 unit/integration tests, 112 Chromium/mobile WebKit checks, and React 18.2/19.3 packaged consumers with strict TypeScript verification.
 
 ## Priority 1: finish the MVP integration options
 

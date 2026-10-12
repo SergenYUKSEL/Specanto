@@ -100,9 +100,15 @@ The reference offers up to 100 operation favorites and the latest 20 completed/c
 | Runtime/font notice verification | 88 packages verified |
 | Library and demo production builds | Passed |
 | Packaged consumer matrix | React 18.2 and 19.3 passed, including comparison/locale exports and session/comparison CSS |
-| `CI=true bun run test:e2e` against the production build | 106 passed across desktop Chromium and WebKit iPhone |
+| `CI=true bun run test:e2e` against the production build | 112 passed across desktop Chromium and WebKit iPhone |
 
 Browser coverage includes comparison filters and localized field changes, translated import errors, favorite clearing, metadata-only history and navigation without replay. An isolated StrictMode host verifies locale changes during requests, cancellation, spec replacement, file import, unmount and ignored late completions. Desktop/mobile previews and new comparison/session screenshots are included.
+
+Public checks exposed an import race: an initial URL document completing after a file import could remove its diagnostic or overwrite a valid imported document. Deferred-source regressions reproduced both failures on Chromium and WebKit. The correction preserves failed-import diagnostics, cancels superseded URL loads and ignores obsolete file reads. A third regression checks competing file reads. All six new browser cases passed in the production suite. Real HTTP history assertions use the numeric status because HTTP/2 responses can omit status text.
+
+The staged secret scan reported no findings. The refreshed local archive contains 42 files, the comparison/locale declarations and session/comparison styles, with no demo server, browser fixtures or bundled fonts. Its manifest remains private.
+
+GitHub CI run `38314545349` for source commit `ea1c1ce` was blocked before any step started. Its check annotation again reports an account payment failure or spending limit requiring review in Billing & plans. Local verification passed; no successful GitHub run or billing change is claimed.
 
 ## Distribution and remaining scope
 
