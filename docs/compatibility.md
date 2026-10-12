@@ -14,6 +14,7 @@ This is a bounded first implementation of an OpenAPI reference and browser HTTP 
 | Reference expansion | Maximum depth 32 and expansion budget 100,000 nodes. Reaching a limit leaves unresolved information and a warning. |
 | Navigation | Operations from the standard HTTP method fields, tag groups, case-insensitive word search and hash links by operation ID. |
 | Servers | Operation server overrides path server, then document server. Declared server-variable defaults are substituted; remaining variables prevent execution. |
+| Server profiles | Optional integrator-provided profiles, validated as a whole, selected across operations. Relative URLs require the loaded document source; origin changes clear credentials. No persistence or automatic request. |
 | Relative servers | For a URL-loaded document, resolve against its source URL. An object/text/file input needs an explicit base in the low-level request API; the component currently requires absolute API server URLs for those inputs. |
 | Markdown | Descriptions render as Markdown without executing raw HTML. |
 | Examples | Explicit examples first, then schema examples/defaults/enums or bounded generated examples. Generated values may not satisfy advanced constraints. |
@@ -35,6 +36,7 @@ This is a bounded first implementation of an OpenAPI reference and browser HTTP 
 | Request bodies | JSON (`application/json` or `+json`) only. Form data, multipart uploads, XML and binary bodies are display-only and cannot execute. |
 | Basic validation | Primitive/nullable types, nested object properties, `required`, arrays, `enum`, numeric `minimum`/`maximum`, `minItems` and `maxItems`. |
 | Boolean schemas | JSON Schema `true`/`false` schemas are unsupported for request construction, including nested schemas and references. Affected requests cannot execute. |
+| JSON editor | First syntax/supported-constraint diagnostic, manual whitespace formatting that preserves literals, and manual authored/generated examples. Shares the partial request validator. |
 | Advanced schemas | Schema data is retained for inspection. Combinators (`oneOf`, `anyOf`, `allOf`, `not`), discriminators and other advanced JSON Schema semantics are not implemented as a full validator. |
 | Additional constraints | `format`, `pattern`, string lengths, `additionalProperties`, exclusive bounds and other undeclared constraints are not enforced by the client. The component warns about partial validation; JSON execution can still proceed and the destination API remains responsible for validation. |
 | Response validation | Status, exposed headers, duration and response text are displayed. Response bodies are not checked against their documented schemas. |
@@ -57,6 +59,7 @@ The Atelier demo server has its own validation: email shape, supported product I
 | Retries | No automatic retry. HTTP 4xx and 5xx responses remain normal results for inspection. |
 | Response limit | The default transport reads at most 100 KiB and marks overflow as truncated. Large, streaming, event-stream and binary responses have no dedicated viewer. |
 | cURL | POSIX-shell quoting with known secret headers redacted by default. The low-level `toCurl(request, true)` opt-in includes those headers. Bodies and ordinary parameters are not redacted. |
+| Fetch/Python snippets | Generated from the current prepared request with known secret headers redacted by default. Python uses Requests and a 45-second connect/read timeout; this is not the component total timeout. Snippets are never executed by Specanto. |
 | Custom transport | A `Transport` prop can replace HTTP behavior; the integrator owns its security, cancellation and response-size policies. |
 | Transport label | `transportMode: 'simulation'` explicitly labels a simulation. An injected transport without an explicit mode is labeled as a custom transport; use `http` only for actual HTTP execution. |
 

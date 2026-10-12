@@ -71,6 +71,16 @@ GitHub Actions automates the checks and tests the production demo build; the sep
 
 Railway deployment `a6f724b4-5748-4ced-a230-7fdaa1e495b2` was observed with status **SUCCESS** on the same project/environment/service. It includes the integration options and public font-license texts. Later library archive/documentation cleanup does not alter demo runtime behavior.
 
+## Console feature follow-up
+
+Three requested extensions are implemented: cURL/Fetch/Python code selection and copying, server profiles supplied by the integrator independently of OpenAPI, and a guided JSON editor. Profile selection survives operation navigation; changing the destination cancels the active request, and changing origins clears credentials. Importing a local document returns to its declared servers.
+
+JSON formatting is manual and preserves number literals, escapes and duplicate keys. Diagnostics reuse the existing partial request validator and show its first field-path error. Authored examples take precedence over generated examples. Snippets redact known secret headers, preserve body content and are never executed by the component. Python uses Requests with a connect/read timeout, distinct from the UI's total request timeout.
+
+Verification: 175 unit/integration tests passed, 86 Chromium/mobile WebKit checks passed against the production demo build, and the packaged consumers passed with React 18.2 and 19.3. The consumer check includes the new profile type, snippet exports and guided-editor CSS. Desktop/mobile screenshots were refreshed. An independent review identified an isolated UTF-16 surrogate case in Python output; it was reproduced, corrected and tested. Sparse profile arrays are also rejected rather than causing a rendering failure.
+
+The remaining feature proposals are specification comparisons, session history/favorites and a configurable FR/EN interface. No npm publication or license adoption is included in this follow-up.
+
 ## Distribution and remaining scope
 
 The local archive is `output/specanto-react-0.1.0.tgz`. It contains JS, CSS, TypeScript declarations and integration/compatibility documentation. The package name is provisional and the manifest stays private.

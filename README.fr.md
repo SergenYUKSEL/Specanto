@@ -79,6 +79,10 @@ Fournissez exactement une entrée : `spec` (objet ou texte JSON/YAML) ou `specUr
 
 Un [exemple Vite permanent](https://github.com/SergenYUKSEL/Specanto/tree/main/examples/consumer-vite) utilise le package installé depuis son archive et un transport de simulation explicite.
 
+## Console enrichie
+
+La console propose des exemples cURL, Fetch et Python à copier, avec les en-têtes secrets masqués. `serverProfiles` fournit des destinations nommées, indépendantes du fichier OpenAPI : le choix reste actif entre les routes, et les identifiants sont effacés quand l’origine change. L’éditeur JSON affiche les erreurs au chemin du champ et propose un formatage ainsi qu’un exemple sur clic. Aucune de ces actions n’envoie une requête automatiquement.
+
 ## Vérifier les changements
 
 ```sh

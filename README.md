@@ -94,6 +94,7 @@ Pass exactly one of `spec` and `specUrl`.
 | `fontFamily` | Optional interface font family; your application supplies the font |
 | `monoFontFamily` | Optional code font family; your application supplies the font |
 | `requestTimeoutMs` | Integer from 100 to 300,000 ms; default 45,000. Invalid values block requests. |
+| `serverProfiles` | Optional named HTTP(S) destinations independent of the OpenAPI document; first profile selected initially. |
 | `transport` | Optional function implementing the exported `Transport` type |
 | `transportMode` | `http` or `simulation`; simulation is explicitly labeled. An injected transport without a mode is labeled as a custom transport. |
 
@@ -101,7 +102,9 @@ See [customization](./docs/customization.md) for branding, fonts, scoped CSS and
 
 Documents loaded by URL resolve relative API servers against their source URL. Documents passed as objects/text or imported from local files need absolute HTTP(S) API server URLs. Operation links use `#operation/{operationId}` with a URL-encoded ID.
 
-The public entry also exports `parseSpec`, `loadSpec`, `searchOperations`, `exampleForSchema`, `buildRequest`, `toCurl`, `httpTransport` and their associated types. `src/core` has no React dependency. See the [compatibility matrix](./docs/compatibility.md) before integrating an API with advanced schemas or serialization.
+The public entry also exports `parseSpec`, `loadSpec`, `searchOperations`, `exampleForSchema`, `buildRequest`, `toCurl`, `toFetch`, `toPython`, `normalizeServerProfiles`, `httpTransport` and their associated types. `src/core` has no React dependency. See the [compatibility matrix](./docs/compatibility.md) before integrating an API with advanced schemas or serialization.
+
+The console generates cURL, Fetch and Python examples from the current form, with known secret headers redacted. The JSON body editor provides field-path diagnostics, manual formatting and manual example insertion; it shares the engine’s partial validation constraints. Profiles and snippets never trigger requests automatically.
 
 ## Check a change
 

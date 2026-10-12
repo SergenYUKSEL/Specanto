@@ -4,6 +4,9 @@
 
 ### Added
 
+- cURL/Fetch/Python selector with current-form examples, secret-header redaction and copy actions.
+- Integrator-defined server profiles that persist across operations, with credential clearing on origin changes and cancellation on destination changes.
+- Guided JSON body editor with field-path diagnostics, manual formatting that preserves literals and manual example insertion.
 - Reusable React reference with OpenAPI 3.1.x JSON/YAML/object/URL input, internal references, search and stable operation links.
 - Manual HTTP console with parameters, JSON bodies, Bearer/API-key headers, origin-bound credentials, cancellation, timeout and redacted cURL.
 - Responsive editorial interface, light/dark modes and inline SVG icons.

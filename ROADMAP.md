@@ -10,7 +10,7 @@ Status checked against the current code and verification results on 12 October 2
 - [x] Bearer and API-key header construction, memory-only credentials, origin binding and redacted cURL.
 - [x] Responsive operation screen, light/dark themes and SVG icons.
 - [x] Fictional Atelier API, stateless demo server, public showcase and Railway CLI deployment.
-- [x] 120 unit/integration tests, 72 Chromium/mobile WebKit browser checks, and React 18.2/19.3 packaged consumers with strict TypeScript verification.
+- [x] 175 unit/integration tests, 86 Chromium/mobile WebKit browser checks, and React 18.2/19.3 packaged consumers with strict TypeScript verification.
 
 ## Priority 1: finish the MVP integration options
 
@@ -42,7 +42,11 @@ Status checked against the current code and verification results on 12 October 2
 
 ## Additional feature proposals
 
-The [prioritized feature backlog](./docs/features.md) proposes multilangage snippets, server profiles, a guided JSON editor, specification comparisons, session history and configurable FR/EN UI. These remain proposals.
+- [x] Current-form cURL/Fetch/Python examples with secret-header redaction and copy actions.
+- [x] Integrator-provided server profiles with selection across operations, origin-bound credential clearing and active-request cancellation.
+- [x] Guided JSON editor with first-error field paths, manual literal-preserving formatting and manual authored/generated examples.
+
+The [feature backlog](./docs/features.md) retains specification comparisons, session history/favorites and configurable FR/EN UI as proposals.
 
 ## Later, optional scope
 
