@@ -1,6 +1,13 @@
 import './styles/reference.css';
 import './styles/json-editor.css';
+import './styles/session.css';
+import './styles/comparison.css';
 export { ApiReference } from './ui/ApiReference';
 export type { ApiReferenceProps } from './ui/ApiReference';
+export type { ReferenceLocale } from './ui/i18n';
+export { SpecComparison } from './ui/SpecComparison';
+export type { SpecComparisonProps } from './ui/SpecComparison';
+export { compareSpecs } from './core/spec-diff';
+export type { SpecDiffReport, SpecDiffChange, SpecDiffCode, SpecDiffSeverity } from './core/spec-diff';
 export { parseSpec, loadSpec, searchOperations, buildRequest, toCurl, toFetch, toPython, normalizeServerProfiles, httpTransport, exampleForSchema } from './core';
 export type { NormalizedSpec, Operation, PreparedRequest, RequestInput, RequestResult, Transport, Schema, ServerProfile } from './core/types';

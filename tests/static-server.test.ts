@@ -18,6 +18,11 @@ describe('demo static server boundaries', () => {
     expect(result.headers.get('content-type')).toContain('text/html');
     expect(await result.text()).toContain('<title>Specanto</title>');
   });
+  test('serves the comparison route as a browser entry', async () => {
+    const result = await handler(new Request('http://local/compare'));
+    expect(result.status).toBe(200);
+    expect(await result.text()).toContain('<title>Specanto</title>');
+  });
   test('serves a real asset rather than the HTML entry', async () => {
     const result = await handler(new Request('http://local/assets/app.js'));
     expect(result.status).toBe(200);

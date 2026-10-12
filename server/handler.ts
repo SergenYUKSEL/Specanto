@@ -15,7 +15,7 @@ export function createHandler(staticRoot: string, api: (request: Request) => Pro
     catch { return new Response('Invalid path', { status: 400 }); }
     const path = resolve(root, '.' + pathname);
     if ((!path.startsWith(root + sep) && path !== root) || pathname.includes('\0') || pathname.includes('\\')) return new Response('Forbidden', { status: 403 });
-    const entry = pathname === '/' || pathname === '/demo' || pathname === '/demo/';
+    const entry = ['/', '/demo', '/demo/', '/compare', '/compare/'].includes(pathname);
     const file = Bun.file(entry ? resolve(root, 'index.html') : path);
     if (!await file.exists()) return new Response('Not found', { status: 404 });
     const headers = new Headers({

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { formatJsonBody, inspectJsonBody, jsonBodyExample } from '../core/body-validation';
 import type { Schema } from '../core/types';
 import { Icon } from './Icon';
+import { useReferenceLocale, useReferenceMessages } from './i18n';
 
 export type JsonBodyEditorProps = {
   id: string;
@@ -17,32 +18,35 @@ export type JsonBodyEditorProps = {
 };
 
 export function JsonBodyEditor({ id, value, onChange, schema, rawSchema, required, example, mediaType = 'application/json', onReset, onNotice }: JsonBodyEditorProps) {
-  const [actionMessage, setActionMessage] = useState('');
-  const inspection = useMemo(() => inspectJsonBody(value, { schema, rawSchema, required }), [value, schema, rawSchema, required]);
+  const t = useReferenceMessages();
+  const locale = useReferenceLocale();
+  const [action, setAction] = useState<'formatted' | 'example' | 'format-error' | null>(null);
+  const inspection = useMemo(() => inspectJsonBody(value, { schema, rawSchema, required, locale }), [value, schema, rawSchema, required, locale]);
   const generatedExample = useMemo(() => jsonBodyExample(schema, rawSchema, example), [schema, rawSchema, example]);
-  const publish = (notice: string) => { setActionMessage(notice); onNotice?.(notice); };
+  const actionMessage = action === 'formatted' ? t.jsonFormatted : action === 'example' ? example !== undefined ? t.documentedExampleInserted : t.generatedExampleInserted : action === 'format-error' ? (() => { const result = formatJsonBody(value, locale); return result.ok ? '' : result.message; })() : '';
+  const publish = (notice: string, nextAction: typeof action) => { setAction(nextAction); onNotice?.(notice); };
   const format = () => {
-    const formatted = formatJsonBody(value);
-    if (!formatted.ok) { publish(formatted.message); return; }
+    const formatted = formatJsonBody(value, locale);
+    if (!formatted.ok) { publish(formatted.message, 'format-error'); return; }
     onChange(formatted.value);
-    publish('Le JSON a été formaté.');
+    publish(t.jsonFormatted, 'formatted');
   };
   const generate = () => {
     if (generatedExample === undefined) return;
     onChange(generatedExample);
-    publish(example !== undefined ? 'L’exemple documenté a été inséré.' : 'Un exemple a été généré à partir du schéma. Vérifiez les contraintes propres à votre API.');
+    publish(example !== undefined ? t.documentedExampleInserted : t.generatedExampleInserted, 'example');
   };
-  const status = inspection.message ?? (inspection.state === 'empty' ? 'Corps vide : aucune valeur JSON ajoutée.' : schema ? 'JSON lisible ; contraintes prises en charge respectées.' : 'Syntaxe JSON valide. Aucun schéma de validation fourni.');
+  const status = inspection.message ?? (inspection.state === 'empty' ? t.emptyJsonBody : schema ? t.jsonConstraintsValid : t.jsonSyntaxValid);
   return <div className="sp-request-body sp-guided-body">
-    <div className="sp-editor-heading"><label htmlFor={id}>Corps{required && <span className="sp-required"> requis</span>}</label><span>{mediaType}</span></div>
-    <div className="sp-json-actions" role="group" aria-label="Actions sur le corps JSON">
-      <button type="button" onClick={format}><Icon name="braces" size={14} />Formater JSON</button>
-      <button type="button" onClick={generate} disabled={generatedExample === undefined}><Icon name="plus" size={14} />Générer un exemple</button>
-      {onReset && <button type="button" className="sp-json-reset" onClick={() => { onReset(); setActionMessage(''); onNotice?.('Le corps de la requête a été réinitialisé.'); }}>Réinitialiser</button>}
+    <div className="sp-editor-heading"><label htmlFor={id}>{t.body}{required && <span className="sp-required"> {t.required}</span>}</label><span>{mediaType}</span></div>
+    <div className="sp-json-actions" role="group" aria-label={t.jsonActions}>
+      <button type="button" onClick={format}><Icon name="braces" size={14} />{t.formatJson}</button>
+      <button type="button" onClick={generate} disabled={generatedExample === undefined}><Icon name="plus" size={14} />{t.generateExample}</button>
+      {onReset && <button type="button" className="sp-json-reset" onClick={() => { onReset(); setAction(null); onNotice?.(t.bodyReset); }}>{t.reset}</button>}
     </div>
-    <textarea id={id} className="sp-json-editor" value={value} onChange={(event) => { setActionMessage(''); onChange(event.target.value); }} spellCheck={false} autoComplete="off" aria-label="Corps JSON de la requête" aria-invalid={!inspection.valid} aria-describedby={`${id}-validation ${id}-scope`} />
+    <textarea id={id} className="sp-json-editor" value={value} onChange={(event) => { setAction(null); onChange(event.target.value); }} spellCheck={false} autoComplete="off" aria-label={t.jsonBodyLabel} aria-invalid={!inspection.valid} aria-describedby={`${id}-validation ${id}-scope`} />
     <div id={`${id}-validation`} className={`sp-json-validation${inspection.valid ? '' : ' sp-json-validation-error'}`} role="status" aria-live="polite" aria-atomic="true">{status}{actionMessage && actionMessage !== status && <span className="sp-json-action-notice">{actionMessage}</span>}</div>
-    <p id={`${id}-scope`} className="sp-json-validation-scope">Validation partielle : types, champs requis, valeurs autorisées, bornes numériques et nombre d’éléments. Les autres contraintes restent à vérifier.</p>
-    {generatedExample === undefined && <p className="sp-json-example-hint">Aucun exemple disponible pour ce schéma.</p>}
+    <p id={`${id}-scope`} className="sp-json-validation-scope">{t.partialValidation}</p>
+    {generatedExample === undefined && <p className="sp-json-example-hint">{t.noSchemaExample}</p>}
   </div>;
 }

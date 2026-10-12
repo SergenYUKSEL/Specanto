@@ -31,6 +31,7 @@ function AtelierLogo() {
 export function App() {
   return <ApiReference
     spec={spec}
+    locale="en"
     logo={<AtelierLogo />}
     colorMode="system"
     accentColor="#c54422"

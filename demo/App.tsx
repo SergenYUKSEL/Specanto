@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ApiReference, type ServerProfile } from '../src';
+import { ApiReference, SpecComparison, type ReferenceLocale, type ServerProfile } from '../src';
 import { Icon } from '../src/ui/Icon';
 import { ImportDialog } from './ImportDialog';
 
@@ -7,8 +7,19 @@ const github = 'https://github.com/SergenYUKSEL/Specanto';
 const atelierProfiles: ServerProfile[] = [{ id: 'atelier', label: 'Atelier · démo active', url: `${window.location.origin}/api`, description: 'API fictive hébergée avec cette démonstration.' }];
 
 export function App() {
-  const isDemo = window.location.pathname.replace(/\/$/, '') === '/demo';
-  return isDemo ? <Demo /> : <Showcase />;
+  const path = window.location.pathname.replace(/\/$/, '');
+  return path === '/demo' ? <Demo /> : path === '/compare' ? <Comparison /> : <Showcase />;
+}
+
+function LanguageSelect({ locale, onChange }: { locale: ReferenceLocale; onChange: (locale: ReferenceLocale) => void }) {
+  return <select aria-label={locale === 'fr' ? 'Langue de l’interface' : 'Interface language'} value={locale} onChange={event => onChange(event.target.value === 'en' ? 'en' : 'fr')}><option value="fr">FR</option><option value="en">EN</option></select>;
+}
+
+function Comparison() {
+  const [locale, setLocale] = useState<ReferenceLocale>(() => new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'fr');
+  const [mode, setMode] = useState<'light' | 'dark'>('light');
+  useEffect(() => { document.title = 'OpenAPI comparison — Specanto'; }, []);
+  return <div className="demo-page" data-mode={mode} lang={locale}><header className="demo-toolbar"><a className="back-link" href={`/demo?lang=${locale}`}><Icon name="arrowLeft" /><span>{locale === 'fr' ? 'Référence API' : 'API reference'}</span></a><div className="demo-actions"><LanguageSelect locale={locale} onChange={setLocale} /><button className="theme-button" onClick={() => setMode(current => current === 'light' ? 'dark' : 'light')} aria-label={locale === 'fr' ? 'Changer le thème' : 'Change theme'}><Icon name={mode === 'light' ? 'moon' : 'sun'} size={22} /></button></div></header><SpecComparison locale={locale} colorMode={mode} /></div>;
 }
 
 function Demo() {
@@ -16,20 +27,23 @@ function Demo() {
   const [mode, setMode] = useState<'light' | 'dark'>('light');
   const [importing, setImporting] = useState(false);
   const [revision, setRevision] = useState(0);
+  const [locale, setLocale] = useState<ReferenceLocale>(() => new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'fr');
   const reset = () => { setInput({ specUrl: '/openapi.json' }); setRevision(v => v + 1); };
   useEffect(() => { document.title = 'Atelier API — Specanto'; }, []);
   return <div className="demo-page" data-mode={mode}>
-    <header className="demo-toolbar">
+    <header className="demo-toolbar" lang={locale}>
       <a className="back-link" href="/"><Icon name="arrowLeft" /><span>Specanto</span></a>
-      <span className="demo-indicator"><span /> API de démonstration</span>
+      <span className="demo-indicator"><span /> {locale === 'fr' ? 'API de démonstration' : 'Demonstration API'}</span>
       <div className="demo-actions">
-        <button onClick={() => setImporting(true)}>Importer une API</button>
-        <button className="theme-button" onClick={() => setMode(m => m === 'light' ? 'dark' : 'light')} aria-label={mode === 'light' ? 'Activer le mode sombre' : 'Activer le mode clair'}><Icon name={mode === 'light' ? 'moon' : 'sun'} size={22} /></button>
+        <a href={`/compare?lang=${locale}`}><Icon name="compare" size={15} />{locale === 'fr' ? 'Comparer' : 'Compare'}</a>
+        <button onClick={() => setImporting(true)}>{locale === 'fr' ? 'Importer une API' : 'Import an API'}</button>
+        <LanguageSelect locale={locale} onChange={setLocale} />
+        <button className="theme-button" onClick={() => setMode(m => m === 'light' ? 'dark' : 'light')} aria-label={locale === 'fr' ? mode === 'light' ? 'Activer le mode sombre' : 'Activer le mode clair' : mode === 'light' ? 'Enable dark mode' : 'Enable light mode'}><Icon name={mode === 'light' ? 'moon' : 'sun'} size={22} /></button>
       </div>
     </header>
-    <ApiReference key={revision} {...input} colorMode={mode} serverProfiles={'specUrl' in input && input.specUrl === '/openapi.json' ? atelierProfiles : undefined} />
-    <footer className="demo-footnote">API fictive. Requêtes HTTP réelles. Aucune commande conservée. <button onClick={reset}>Revenir à Atelier</button></footer>
-    {importing && <ImportDialog onClose={() => setImporting(false)} onImport={value => { setInput(value); setRevision(v => v + 1); setImporting(false); }} />}
+    <ApiReference key={revision} {...input} locale={locale} colorMode={mode} serverProfiles={'specUrl' in input && input.specUrl === '/openapi.json' ? atelierProfiles : undefined} />
+    <footer className="demo-footnote" lang={locale}>{locale === 'fr' ? 'API fictive. Requêtes HTTP réelles. Aucune commande conservée.' : 'Fictional API. Real HTTP requests. No orders retained.'} <button onClick={reset}>{locale === 'fr' ? 'Revenir à Atelier' : 'Return to Atelier'}</button></footer>
+    {importing && <ImportDialog locale={locale} onClose={() => setImporting(false)} onImport={value => { setInput(value); setRevision(v => v + 1); setImporting(false); }} />}
   </div>;
 }
 

@@ -10,8 +10,8 @@ export function resolveRequestTimeout(value: unknown): number {
   return value;
 }
 
-export function describeRequestTimeout(timeoutMs: number): string {
+export function describeRequestTimeout(timeoutMs: number, locale: 'fr' | 'en' = 'fr'): string {
   const seconds = timeoutMs / 1000;
-  const duration = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 3, useGrouping: false }).format(seconds);
-  return `${duration} ${seconds < 2 ? 'seconde' : 'secondes'}`;
+  const duration = new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'fr-FR', { maximumFractionDigits: 3, useGrouping: false }).format(seconds);
+  return `${duration} ${locale === 'en' ? seconds === 1 ? 'second' : 'seconds' : seconds < 2 ? 'seconde' : 'secondes'}`;
 }

@@ -76,6 +76,11 @@
 .sp-reference .sp-nav-group h2 { padding: 0 8px; margin-bottom: 9px; font-size: 12px; font-weight: 650; }
 .sp-reference .sp-operation-link { display: flex; align-items: flex-start; gap: 8px; padding: 10px 7px; min-height: 39px; text-decoration: none; border-left: 2px solid transparent; font-size: 12px; line-height: 1.6; }
 .sp-reference .sp-operation-link > span:last-child { padding-top: 1px; }
+.sp-reference .sp-operation-row { display: flex; min-width: 0; align-items: stretch; }
+.sp-reference .sp-operation-row > .sp-operation-link { flex: 1; min-width: 0; }
+.sp-reference .sp-favorite-toggle { flex-shrink: 0; width: 25px; padding: 0; border: 0; background: transparent; color: var(--sp-muted); }
+.sp-reference .sp-favorite-toggle[aria-pressed='true'] { color: var(--sp-accent); }
+.sp-reference .sp-favorite-toggle[aria-pressed='true'] > svg { fill: var(--sp-accent-soft); }
 .sp-reference .sp-operation-link:hover, .sp-reference .sp-overview-link:hover { background: var(--sp-panel); }
 .sp-reference .sp-nav-active { background: var(--sp-accent-soft); border-left-color: var(--sp-accent); font-weight: 600; }
 .sp-reference .sp-method { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; min-width: 39px; padding: 3px 5px; border-radius: 3px; font: 500 11px/1.35 var(--sp-mono); letter-spacing: -.02em; background: var(--sp-panel); color: var(--sp-muted); }
