@@ -48,10 +48,33 @@ Decorative text glyphs were replaced with shared inline SVGs in `src/ui/Icon.tsx
 
 Railway deployment `6537e09e-65cb-498b-ab09-1f2ca709a350` was observed with status **SUCCESS** on the same service and environment.
 
+## MVP integration and verification follow-up
+
+The integrator can now provide a desktop/mobile `logo`, `monoFontFamily` and validated `requestTimeoutMs`. The timeout defaults to 45,000 ms and accepts integers from 100 to 300,000 ms. Invalid configuration blocks execution. Timeout/cancellation ignore late transport completions.
+
+The permanent `examples/consumer-vite` application installs the real package archive without source aliases. The consumer runner checks React 18.2.0 and 19.3.0 with matching type definitions, strict public type contracts, runtime parser/component imports, Vite builds and exported CSS. A Node import issue was corrected by leaving `react-markdown` and `yaml` as runtime dependencies so each environment resolves its own entry points. Only the initial loading state is rendered in the server smoke check; hydration and server-rendered documentation are not promised. The library build excludes demo public assets.
+
+| Follow-up check | Observed result |
+| --- | --- |
+| Frozen installation, lint and TypeScript | Passed |
+| Unit/integration suite | 120 passed |
+| Runtime/font notice verification | 88 packages verified |
+| Library and demo production builds | Passed |
+| Packaged consumer matrix | React 18.2 and 19.3 passed |
+| Local browser suite | 72 passed across Chromium and WebKit iPhone |
+| `CI=true bun run test:e2e` against the production build | 72 passed |
+| Public Railway browser checks | 12 passed: responsive layouts, navigation and real GET/POST on both browsers |
+| Public pages, health, products and font-license endpoints | HTTP 200 |
+| Staged secret scan and whitespace checks | No findings / passed |
+
+GitHub Actions automates the checks and tests the production demo build; the separate browser fixture host is excluded from deployment and the package. The release procedure stays manual. README captures, the unreleased changelog and dependency/font notices are included. GitHub private vulnerability reporting is enabled and linked from SECURITY.md.
+
+Railway deployment `a6f724b4-5748-4ced-a230-7fdaa1e495b2` was observed with status **SUCCESS** on the same project/environment/service. It includes the integration options and public font-license texts. Later library archive/documentation cleanup does not alter demo runtime behavior.
+
 ## Distribution and remaining scope
 
 The local archive is `output/specanto-react-0.1.0.tgz`. It contains JS, CSS, TypeScript declarations and integration/compatibility documentation. The package name is provisional and the manifest stays private.
 
-Publication to npm, adopting the proposed license, final brand decisions and the broader roadmap remain separate decisions. Advanced JSON Schema validation, external references, OAuth/OIDC, multipart, streaming and multi-API portals are outside this release. The [compatibility matrix](./compatibility.md) records the current behavior and protection limits.
+Publication to npm, adopting the proposed license and control of the npm scope remain separate decisions. The completed integration/verification work and proposed extra features are recorded in the roadmap. Advanced JSON Schema validation, external references, OAuth/OIDC, multipart, streaming and multi-API portals are outside this release. The [compatibility matrix](./compatibility.md) records the current behavior and protection limits.
 
-The [roadmap](../ROADMAP.md) separates remaining MVP integration options, verification gaps, CI and publication preparation from optional future scope.
+The [roadmap](../ROADMAP.md) records shipped MVP integration options, verification and CI, remaining publication decisions, and [proposed future features](./features.md).
