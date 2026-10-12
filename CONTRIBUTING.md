@@ -40,7 +40,7 @@ bun run check:consumer
 bun run test:e2e
 ```
 
-`check` runs lint, strict TypeScript checks, the Bun tests and library/demo builds. The packaged-consumer check exercises the public JavaScript, React peer dependency and CSS exports from a separate application. The library build also emits TypeScript declarations. Playwright tests exercise the demo; install Chromium if necessary with `bunx playwright install chromium`.
+`check` runs lint, strict TypeScript checks, the Bun tests and library/demo builds. The packaged-consumer check exercises the public JavaScript, React peer dependency and CSS exports from a separate application. The library build also emits TypeScript declarations. Playwright runs Chromium and mobile WebKit against the demo and a separate integration fixture; install both with `bunx playwright install chromium webkit`. GitHub Actions uses the production demo build. The permanent example and consumer runner verify React 18.2/19.3 and the exported TypeScript contracts.
 
 Individual commands are available when working on a focused area:
 
@@ -63,3 +63,5 @@ Update the [compatibility matrix](./docs/compatibility.md) when support changes.
 The public showcase and demo deploy through the Railway CLI to the exact project, environment and selected demo service recorded in the [README](./README.md#deployment). Deployment changes should pass the checks and be followed by a deployment-status and HTTP health check.
 
 The MIT text under `docs` is a proposal awaiting the author's decision. Do not replace it with an adopted root license or publish the package as part of a routine contribution.
+
+Refresh third-party notices after a runtime/font dependency update with `bun run scripts/notices.ts`. Follow the [manual release procedure](./docs/releasing.md) for a publication candidate.

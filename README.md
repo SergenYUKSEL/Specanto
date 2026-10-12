@@ -4,7 +4,7 @@ API documentation, with character.
 
 Specanto turns an OpenAPI document into a searchable React reference with a manual HTTP request panel. It brings navigation, readable schemas, request examples and responses into one responsive screen.
 
-[Français](./README.fr.md) · [Compatibility](./docs/compatibility.md) · [Contributing](./CONTRIBUTING.md) · [Roadmap](./ROADMAP.md)
+[Français](./README.fr.md) · [Compatibility](./docs/compatibility.md) · [Contributing](./CONTRIBUTING.md) · [Roadmap](./ROADMAP.md) · [Feature proposals](./docs/features.md)
 
 ## Current delivery
 
@@ -19,6 +19,15 @@ The repository also contains a showcase at `/` and an interactive demo at `/demo
 | `POST /api/orders` | Validate and echo a fictitious order |
 
 There is no payment, account or database. The demo server does not retain orders, log request bodies or store Bearer tokens. Its optional authentication accepts a fictitious token. Order bodies are limited to 16 KiB. Use fictional customer details, such as `camille@example.com`.
+
+![Desktop reference](./docs/screenshots/reference-desktop.png)
+
+<details>
+<summary>Mobile reference</summary>
+
+![Mobile reference](./docs/screenshots/reference-mobile.png)
+
+</details>
 
 ## Run the project
 
@@ -78,12 +87,17 @@ Pass exactly one of `spec` and `specUrl`.
 | `spec` | An OpenAPI object, JSON text or YAML text |
 | `specUrl` | URL of an OpenAPI document; relative URLs work in the browser |
 | `title` | Optional displayed title |
+| `logo` | Optional React node for the desktop/mobile brand |
 | `theme` | The current theme is `editorial` |
 | `colorMode` | `light`, `dark` or `system` |
 | `accentColor` | Optional accent color |
 | `fontFamily` | Optional interface font family; your application supplies the font |
+| `monoFontFamily` | Optional code font family; your application supplies the font |
+| `requestTimeoutMs` | Integer from 100 to 300,000 ms; default 45,000. Invalid values block requests. |
 | `transport` | Optional function implementing the exported `Transport` type |
 | `transportMode` | `http` or `simulation`; simulation is explicitly labeled. An injected transport without a mode is labeled as a custom transport. |
+
+See [customization](./docs/customization.md) for branding, fonts, scoped CSS and timeout examples. A permanent [Vite consumer](https://github.com/SergenYUKSEL/Specanto/tree/main/examples/consumer-vite) demonstrates archive installation and an explicitly labeled simulation.
 
 Documents loaded by URL resolve relative API servers against their source URL. Documents passed as objects/text or imported from local files need absolute HTTP(S) API server URLs. Operation links use `#operation/{operationId}` with a URL-encoded ID.
 
@@ -97,7 +111,9 @@ bun run check:consumer
 bun run test:e2e
 ```
 
-`check` runs lint, TypeScript checks, unit tests and both builds. `check:consumer` checks installation and imports in a separate packaged consumer. Browser checks cover the actual demo. Install the Playwright browser if it is missing with `bunx playwright install chromium`.
+`check` runs lint, TypeScript checks, unit tests, third-party notice verification and both builds. `check:consumer` installs the archive in separate React 18.2 and 19.3 consumers, then verifies strict TypeScript, public JS/CSS exports and builds. Browser checks run Chromium and mobile WebKit against the demo and an isolated integration host. Install the browsers if missing with `bunx playwright install chromium webkit`.
+
+GitHub Actions runs these checks for main pushes and pull requests. In CI, browser tests use the production demo build. See the [manual release procedure](./docs/releasing.md); the workflow does not publish npm packages.
 
 The individual commands are `bun run lint`, `bun run typecheck`, `bun run test`, `bun run build:lib` and `bun run build:demo`.
 
@@ -128,6 +144,8 @@ The browser suite can target a production container or the live service:
 SPECANTO_TEST_URL=http://localhost:3000 bun run test:e2e
 ```
 
-## License status
+## Licenses and release status
 
 A [proposed MIT license](./docs/LICENSE-MIT.proposed.txt) is prepared for the author's review. No project license has been adopted yet, and no package publication is authorized by this proposal.
+
+[Third-party notices](./THIRD_PARTY_NOTICES.md) preserve dependency and demo font licenses. [Changelog](./CHANGELOG.md) records the unreleased candidate.

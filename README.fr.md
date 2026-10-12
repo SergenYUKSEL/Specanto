@@ -4,7 +4,7 @@ La documentation API, avec du caractère.
 
 Specanto transforme une description OpenAPI en documentation React interactive : navigation par tags, recherche, schémas, exemples et panneau de requête HTTP manuel. L’interface s’adapte aux écrans mobiles et propose un mode sombre.
 
-[English](./README.md) · [Compatibilité](./docs/compatibility.md) · [Contribuer](./CONTRIBUTING.md)
+[English](./README.md) · [Compatibilité](./docs/compatibility.md) · [Contribuer](./CONTRIBUTING.md) · [Fonctionnalités proposées](./docs/features.md)
 
 ## État du projet
 
@@ -19,6 +19,8 @@ La vitrine est disponible sur `/`, et la démo sur `/demo`. La démo utilise Ate
 | `POST /api/orders` | Valider et renvoyer une commande fictive |
 
 Les requêtes HTTP sont réelles. Il n’y a ni compte, ni paiement, ni base de données. Le serveur ne conserve pas les commandes, ne journalise pas leurs corps et ne stocke pas les jetons Bearer. Le jeton est facultatif et peut être fictif. Le corps d’une commande est limité à 16 Kio. Utilisez des coordonnées fictives, comme `camille@example.com`.
+
+![Référence API sur ordinateur](./docs/screenshots/reference-desktop.png)
 
 ## Lancer le projet
 
@@ -71,6 +73,12 @@ La bibliothèque s’intègre à votre hébergement habituel. Elle n’a besoin 
 
 Fournissez exactement une entrée : `spec` (objet ou texte JSON/YAML) ou `specUrl`. Les options sont détaillées dans le [README anglais](./README.md#component-api). Un document chargé par URL résout ses serveurs relatifs à partir de son URL source. Pour un objet, du texte ou un fichier local, utilisez des serveurs API avec une URL HTTP(S) absolue. Pour une simulation injectée via `transport`, indiquez `transportMode="simulation"` : le panneau affiche explicitement son mode.
 
+## Personnaliser
+
+`logo` remplace la marque sur ordinateur et mobile. `fontFamily` et `monoFontFamily` configurent les deux familles ; votre application charge les polices. `requestTimeoutMs` accepte un entier de 100 à 300 000 ms, avec 45 000 ms par défaut. Une valeur invalide bloque l’envoi. Le [guide de personnalisation](./docs/customization.md) montre aussi les variables CSS limitées au composant.
+
+Un [exemple Vite permanent](https://github.com/SergenYUKSEL/Specanto/tree/main/examples/consumer-vite) utilise le package installé depuis son archive et un transport de simulation explicite.
+
 ## Vérifier les changements
 
 ```sh
@@ -79,7 +87,9 @@ bun run check:consumer
 bun run test:e2e
 ```
 
-`check` lance le lint, la vérification TypeScript, les tests unitaires et les deux builds. `check:consumer` vérifie le package dans une application distincte. Pour les tests navigateur, installez Chromium si nécessaire avec `bunx playwright install chromium`.
+`check` lance le lint, TypeScript, les tests, la vérification des notices et les deux builds. `check:consumer` vérifie l’archive et les types dans des applications React 18.2 et 19.3 distinctes. Les tests navigateur utilisent Chromium et WebKit mobile : installez-les si nécessaire avec `bunx playwright install chromium webkit`.
+
+GitHub Actions automatise ces contrôles sur les pushes main et les pull requests. Les tests CI utilisent le build de production. La [procédure de sortie](./docs/releasing.md) garde la publication npm manuelle.
 
 Consultez la [matrice de compatibilité](./docs/compatibility.md) pour les limites OpenAPI, les schémas avancés, l’authentification et la sérialisation.
 
@@ -97,3 +107,5 @@ Le service est `specanto-demo` (`ac4e2b9e-b881-45bc-b75f-34d4952b9bc1`). Le [REA
 ## Licence
 
 Le [texte MIT proposé](./docs/LICENSE-MIT.proposed.txt) est préparé pour validation par l’auteur. Aucune licence du projet n’a encore été adoptée et le package reste non publié.
+
+Les [notices tierces](./THIRD_PARTY_NOTICES.md) conservent les licences des dépendances et des polices de démo. Le [changelog](./CHANGELOG.md) décrit la version candidate.

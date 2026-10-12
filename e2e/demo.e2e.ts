@@ -25,7 +25,7 @@ test('shows an actionable parsing error for an unsupported version', async ({ pa
 });
 
 for (const width of [390, 768, 1440]) {
-  test(`reference is readable without global overflow at ${width}px`, async ({ page }) => {
+  test(`reference is readable without global overflow at ${width}px`, async ({ page }, testInfo) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto('/demo');
     await expect(page.getByRole('heading', { name: 'Créer une commande', exact: true })).toBeVisible();
@@ -37,7 +37,7 @@ for (const width of [390, 768, 1440]) {
       expect(documentation!.x).toBeGreaterThanOrEqual(navigation!.x + navigation!.width - 1);
       expect(consolePanel!.x).toBeGreaterThanOrEqual(documentation!.x + documentation!.width - 1);
     }
-    await page.screenshot({ path: `test-results/reference-${width}.png`, fullPage: true });
+    await page.screenshot({ path: `test-results/${testInfo.project.name}/reference-${width}.png`, fullPage: true });
   });
 }
 
@@ -105,6 +105,9 @@ test('clears credentials when the server origin changes', async ({ page }) => {
 
 test('navigates to a product, preserves its deep link and sends a GET', async ({ page }) => {
   await page.goto('/demo');
+  await expect(page.getByRole('heading', { name: 'Créer une commande', exact: true })).toBeVisible();
+  const openNavigation = page.getByRole('button', { name: 'Ouvrir la navigation', exact: true });
+  if (await openNavigation.isVisible()) await openNavigation.click();
   await page.getByRole('link', { name: /Consulter un produit/ }).click();
   await expect(page).toHaveURL(/#operation\/getProduct$/);
   await page.reload();
@@ -115,13 +118,13 @@ test('navigates to a product, preserves its deep link and sends a GET', async ({
   await expect(response).toContainText('Lampe Halo');
 });
 
-test('renders a dark theme with no console errors', async ({ page }) => {
+test('renders a dark theme with no console errors', async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/demo');
   await page.getByRole('button', { name: 'Activer le mode sombre', exact: true }).click();
   await expect(page.locator('.sp-reference')).toHaveAttribute('data-color-mode', 'dark');
-  await page.screenshot({ path: 'test-results/reference-dark.png', fullPage: true });
+  await page.screenshot({ path: `test-results/${testInfo.project.name}/reference-dark.png`, fullPage: true });
   expect(errors).toEqual([]);
 });
 

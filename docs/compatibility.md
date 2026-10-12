@@ -52,6 +52,7 @@ The Atelier demo server has its own validation: email shape, supported product I
 | URLs | HTTP(S) only. Usernames/passwords in URLs are rejected. A relative URL requires a base. |
 | Browser fetch | Direct requests to the chosen API, no Specanto proxy. The API must permit browser access via CORS. Cookies are omitted. |
 | Redirects | Redirects are rejected for requests containing known secret headers; unauthenticated requests follow redirects. |
+| Request timeout | Component default 45,000 ms; configurable with `requestTimeoutMs`, integer from 100 to 300,000 ms. Invalid configuration blocks execution. |
 | Cancellation | The default transport accepts an `AbortSignal`; the component provides manual cancellation and timeout handling. |
 | Retries | No automatic retry. HTTP 4xx and 5xx responses remain normal results for inspection. |
 | Response limit | The default transport reads at most 100 KiB and marks overflow as truncated. Large, streaming, event-stream and binary responses have no dedicated viewer. |

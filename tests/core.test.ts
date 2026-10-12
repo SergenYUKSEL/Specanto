@@ -217,6 +217,35 @@ describe('Request preparation', () => {
     expect(() => buildRequest(op, input({ body: 'null' }))).toThrow(/object/i);
   });
 
+  test('validates enum membership and nullable JSON types without treating null as a string', () => {
+    const enumBody = operation({ requestBody: { content: { 'application/json': { schema: { type: 'string', enum: ['draft', 'ready'] } } } } }, '/products');
+    expect(buildRequest(enumBody, input({ body: '"draft"' })).body).toBe('"draft"');
+    expect(() => buildRequest(enumBody, input({ body: '"unknown"' }))).toThrow(/enum/i);
+    const nullable = operation({ requestBody: { content: { 'application/json': { schema: { type: ['string', 'null'] } } } } }, '/products');
+    expect(buildRequest(nullable, input({ body: 'null' })).body).toBe('null');
+    expect(buildRequest(nullable, input({ body: '"name"' })).body).toBe('"name"');
+    expect(() => buildRequest(nullable, input({ body: '42' }))).toThrow(/string or null/i);
+  });
+
+  test('enforces inclusive numeric minimum and maximum on request bodies and parameters', () => {
+    const numeric = operation({ parameters: [{ name: 'count', in: 'query', required: true, schema: { type: 'integer', minimum: 2, maximum: 5 } }] }, '/products');
+    for (const value of ['2', '5']) expect(buildRequest(numeric, input({ parameterValues: { 'query:count': value } })).url).toContain(`count=${value}`);
+    expect(() => buildRequest(numeric, input({ parameterValues: { 'query:count': '1' } }))).toThrow(/at least 2/i);
+    expect(() => buildRequest(numeric, input({ parameterValues: { 'query:count': '6' } }))).toThrow(/at most 5/i);
+    const body = operation({ requestBody: { content: { 'application/json': { schema: { type: 'number', minimum: -0.5, maximum: 1.5 } } } } }, '/products');
+    for (const value of ['-0.5', '1.5']) expect(buildRequest(body, input({ body: value })).body).toBe(value);
+    expect(() => buildRequest(body, input({ body: '-0.6' }))).toThrow(/at least/i);
+    expect(() => buildRequest(body, input({ body: '1.6' }))).toThrow(/at most/i);
+  });
+
+  test('enforces minItems, maxItems and nested item constraints', () => {
+    const op = operation({ requestBody: { content: { 'application/json': { schema: { type: 'array', minItems: 1, maxItems: 2, items: { type: 'integer', minimum: 1 } } } } } }, '/products');
+    for (const body of ['[1]', '[1,2]']) expect(buildRequest(op, input({ body })).body).toBe(body);
+    expect(() => buildRequest(op, input({ body: '[]' }))).toThrow(/at least 1 items/i);
+    expect(() => buildRequest(op, input({ body: '[1,2,3]' }))).toThrow(/at most 2 items/i);
+    expect(() => buildRequest(op, input({ body: '[0]' }))).toThrow(/\[0\].*at least 1/i);
+  });
+
   test('refuses browser-controlled headers and line breaks', () => {
     for (const name of ['Host', 'Cookie', 'Content-Length', 'Sec-Fetch-Site', 'Proxy-Authorization']) {
       const op = operation({ parameters: [{ name, in: 'header', schema: { type: 'string' } }] }, '/products');
@@ -345,5 +374,31 @@ describe('Bounded HTTP loading and transport', () => {
       await expect(httpTransport({ url: server.url.href, method: 'GET', headers: {}, hasSecrets: false, secretHeaders: [] }, controller.signal)).rejects.toMatchObject({ name: 'TransportError', kind: 'abort' });
       expect(received).toBe(0);
     } finally { server.stop(true); }
+  });
+
+  test('aborts a request while its HTTP response stream is still active', async () => {
+    let received = 0;
+    let markReceived: (() => void) | undefined;
+    const started = new Promise<void>(resolve => { markReceived = resolve; });
+    const server = Bun.serve({ port: 0, hostname: '127.0.0.1', fetch() {
+      received++;
+      markReceived?.();
+      return new Response(new ReadableStream({ start(controller) { controller.enqueue(new TextEncoder().encode('partial')); } }));
+    } });
+    const controller = new AbortController();
+    try {
+      const request = httpTransport({ url: server.url.href, method: 'GET', headers: {}, hasSecrets: false, secretHeaders: [] }, controller.signal);
+      await started;
+      controller.abort();
+      await expect(request).rejects.toMatchObject({ name: 'TransportError', kind: 'abort' });
+      expect(received).toBe(1);
+    } finally { server.stop(true); }
+  });
+
+  test('classifies connection failures as network errors', async () => {
+    const server = Bun.serve({ port: 0, hostname: '127.0.0.1', fetch() { return new Response('unused'); } });
+    const url = server.url.href;
+    server.stop(true);
+    await expect(httpTransport({ url, method: 'GET', headers: {}, hasSecrets: false, secretHeaders: [] })).rejects.toMatchObject({ name: 'TransportError', kind: 'network' });
   });
 });

@@ -1,6 +1,6 @@
 # Security
 
-Security reporting contact has not been configured yet. Do not post credentials, customer data or private API documents in public issues. A private reporting channel or response timetable is not currently promised.
+Report a vulnerability privately through [GitHub private vulnerability reporting](https://github.com/SergenYUKSEL/Specanto/security/advisories/new). Private reporting is enabled for this repository. Do not post credentials, customer data or private API documents in public issues. This early project does not promise a fixed response timetable.
 
 Specanto is an early browser-based API reference. It parses API descriptions and sends requests to the destination selected by the user. It does not provide an API proxy, hosted credential vault or full JSON Schema validation.
 
@@ -19,4 +19,4 @@ A custom `transport` replaces the default HTTP behavior. Its integrator is respo
 
 Atelier is fictional. Its order endpoint validates and returns a fictitious order, without saving it or processing payments. The server does not log request bodies or retain authentication tokens. Use fictitious details and tokens when exploring the public demo. Order bodies have a 16 KiB limit.
 
-If you find a problem, keep a minimal reproduction with fictional inputs and the affected version while a suitable reporting contact is established. See [compatibility](./docs/compatibility.md) for the limits of the client validator and supported authentication methods.
+Include a minimal reproduction with fictional inputs and the affected version in your private report. See [compatibility](./docs/compatibility.md) for the limits of the client validator and supported authentication methods.
