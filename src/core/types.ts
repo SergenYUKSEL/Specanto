@@ -1,0 +1,72 @@
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'TRACE';
+export type Schema = {
+  type?: string | string[];
+  title?: string;
+  description?: string;
+  format?: string;
+  properties?: Record<string, Schema>;
+  required?: string[];
+  items?: Schema;
+  enum?: unknown[];
+  example?: unknown;
+  examples?: unknown[];
+  default?: unknown;
+  $ref?: string;
+  [key: string]: unknown;
+};
+export type Server = { url: string; description?: string };
+export type Parameter = {
+  name: string;
+  in: 'path' | 'query' | 'header' | 'cookie';
+  required: boolean;
+  description?: string;
+  schema?: Schema;
+  /** Exact resolved schema source, including OpenAPI 3.1 boolean schemas. */
+  rawSchema?: unknown;
+  example?: unknown;
+  style?: string;
+  explode?: boolean;
+  supported: boolean;
+};
+export type RequestBody = { required: boolean; description?: string; mediaType: string; schema?: Schema; rawSchema?: unknown; example?: unknown; supported: boolean };
+export type ApiResponse = { status: string; description: string; contentType?: string; schema?: Schema; rawSchema?: unknown; example?: unknown };
+export type SecurityScheme = { type: string; scheme?: string; in?: string; name?: string; description?: string; supported: boolean };
+export type SecurityRequirement = Record<string, string[]>;
+export type Operation = {
+  id: string;
+  method: HttpMethod;
+  path: string;
+  summary: string;
+  description: string;
+  tags: string[];
+  parameters: Parameter[];
+  requestBody?: RequestBody;
+  responses: ApiResponse[];
+  security: SecurityRequirement[];
+  securitySchemes: Record<string, SecurityScheme>;
+  servers: Server[];
+  warnings: string[];
+  unsupported: string[];
+};
+export type NormalizedSpec = {
+  title: string;
+  version: string;
+  description: string;
+  servers: Server[];
+  tags: { name: string; description?: string }[];
+  operations: Operation[];
+  warnings: string[];
+  sourceUrl?: string;
+};
+export type RequestInput = {
+  serverUrl: string;
+  parameterValues: Record<string, string>;
+  body?: string;
+  credentials: Record<string, string>;
+  credentialOrigins: Record<string, string>;
+  authAlternative?: number;
+  baseUrl?: string;
+};
+export type PreparedRequest = { url: string; method: HttpMethod; headers: Record<string, string>; body?: string; hasSecrets: boolean; secretHeaders: string[] };
+export type RequestResult = { status: number; statusText: string; duration: number; headers: Record<string, string>; body: string; truncated?: boolean };
+export type Transport = (request: PreparedRequest, signal?: AbortSignal) => Promise<RequestResult>;

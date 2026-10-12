@@ -1,0 +1,48 @@
+{
+  "name": "@specanto/react",
+  "version": "0.1.0",
+  "description": "An expressive, reusable OpenAPI reference for React.",
+  "type": "module",
+  "private": true,
+  "packageManager": "bun@1.3.14",
+  "files": ["dist", "README.md", "README.fr.md", "CONTRIBUTING.md", "SECURITY.md", "docs/compatibility.md", "docs/LICENSE-MIT.proposed.txt"],
+  "sideEffects": ["**/*.css"],
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/specanto.js" },
+    "./styles.css": "./dist/styles.css"
+  },
+  "scripts": {
+    "dev": "bun run scripts/dev.ts",
+    "dev:ui": "bun --bun vite --config vite.demo.config.ts --host 0.0.0.0",
+    "dev:api": "PORT=3001 bun run server/index.ts",
+    "build": "bun run build:lib && bun run build:demo",
+    "build:lib": "bun --bun vite build && bun --bun tsc -p tsconfig.lib.json",
+    "build:demo": "bun --bun vite build --config vite.demo.config.ts",
+    "start": "bun run server/index.ts",
+    "test": "bun test ./tests",
+    "test:e2e": "playwright test",
+    "typecheck": "bun --bun tsc --noEmit",
+    "lint": "eslint .",
+    "check": "bun run lint && bun run typecheck && bun run test && bun run build",
+    "check:consumer": "bun run scripts/check-consumer.ts"
+  },
+  "peerDependencies": { "react": ">=18.2.0 <20", "react-dom": ">=18.2.0 <20" },
+  "dependencies": { "react-markdown": "10.1.0", "yaml": "2.9.1" },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@fontsource-variable/archivo": "5.3.0",
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "@playwright/test": "1.64.0",
+    "@types/bun": "1.4.3",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "eslint": "10.12.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.2",
+    "vite": "8.3.4"
+  }
+}

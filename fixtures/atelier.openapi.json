@@ -1,0 +1,100 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Atelier API",
+    "version": "1.0.0",
+    "description": "La boutique fictive d’objets design de Specanto. Explorez le catalogue et créez une commande de démonstration. Les appels HTTP sont réels, mais aucune commande ni donnée personnelle n’est conservée."
+  },
+  "servers": [{ "url": "/api", "description": "API de démonstration — même origine" }],
+  "tags": [
+    { "name": "Produits", "description": "Des objets utiles, dessinés avec soin." },
+    { "name": "Commandes", "description": "Essayez un achat fictif, sans paiement ni stockage." }
+  ],
+  "paths": {
+    "/products": {
+      "get": {
+        "operationId": "listProducts",
+        "tags": ["Produits"],
+        "summary": "Lister les produits",
+        "description": "Consultez les objets du catalogue Atelier. Les prix sont exprimés en euros. Filtrez par catégorie ou limitez le nombre de résultats.",
+        "parameters": [
+          { "name": "limit", "in": "query", "description": "Nombre maximum de produits retournés, de 1 à 100.", "schema": { "type": "integer", "minimum": 1, "maximum": 100 }, "example": 3 },
+          { "name": "category", "in": "query", "description": "Catégorie des objets recherchés.", "schema": { "type": "string", "enum": ["luminaire", "mobilier", "accessoire"] }, "example": "luminaire" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Le catalogue demandé.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProductList" }, "example": { "data": [{ "id": "prd_01", "name": "Lampe Halo", "description": "Une lampe en aluminium brossé à la lumière douce.", "priceEUR": 89, "category": "luminaire", "inStock": true }], "meta": { "total": 1, "currency": "EUR" } } } }
+          },
+          "400": { "$ref": "#/components/responses/ValidationError" },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "operationId": "getProduct",
+        "tags": ["Produits"],
+        "summary": "Consulter un produit",
+        "description": "Retrouvez les détails d’un objet à partir de son identifiant dans le catalogue.",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "description": "Identifiant du produit.", "schema": { "type": "string" }, "example": "prd_01" }],
+        "responses": {
+          "200": { "description": "Le produit demandé.", "content": { "application/json": { "schema": { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/Product" } }, "required": ["data"] }, "example": { "data": { "id": "prd_01", "name": "Lampe Halo", "description": "Une lampe en aluminium brossé à la lumière douce.", "priceEUR": 89, "category": "luminaire", "inStock": true } } } } },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+    "/orders": {
+      "post": {
+        "operationId": "createOrder",
+        "tags": ["Commandes"],
+        "summary": "Créer une commande",
+        "description": "Créez une commande fictive avec un ou plusieurs objets Atelier. Le serveur calcule le total et renvoie la commande confirmée. Aucune donnée n’est enregistrée et aucun paiement n’est effectué. Le jeton Bearer est facultatif pour cette démonstration. Le corps JSON est limité à 16 Kio.",
+        "security": [{ "bearerAuth": [] }, {}],
+        "requestBody": {
+          "required": true,
+          "description": "Le client et les produits à commander. Utilisez une adresse fictive.",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/OrderInput" },
+              "example": {
+                "customer": { "email": "camille@example.com" },
+                "items": [{ "productId": "prd_01", "quantity": 1 }, { "productId": "prd_03", "quantity": 2 }],
+                "currency": "EUR"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "La commande fictive a été confirmée.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Order" }, "example": { "id": "ord_demo_01", "status": "confirmed", "customer": { "email": "camille@example.com" }, "items": [{ "productId": "prd_01", "name": "Lampe Halo", "quantity": 1, "unitPriceEUR": 89, "lineTotalEUR": 89 }, { "productId": "prd_03", "name": "Carnet Ligne", "quantity": 2, "unitPriceEUR": 18, "lineTotalEUR": 36 }], "total": 125, "currency": "EUR" } } }
+          },
+          "400": { "$ref": "#/components/responses/ValidationError" },
+          "413": { "description": "Le corps de la requête dépasse 16 Kio.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" }, "example": { "error": { "code": "payload_too_large", "message": "Le corps JSON est limité à 16 Kio." } } } } },
+          "415": { "description": "Le corps doit utiliser le type application/json.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" }, "example": { "error": { "code": "unsupported_media_type", "message": "Utilisez le type application/json." } } } } },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": { "bearerAuth": { "type": "http", "scheme": "bearer", "description": "Facultatif pour la démo. Utilisez un jeton fictif ; il n’est ni conservé ni journalisé." } },
+    "schemas": {
+      "Product": { "type": "object", "required": ["id", "name", "description", "priceEUR", "category", "inStock"], "properties": { "id": { "type": "string", "example": "prd_01" }, "name": { "type": "string", "example": "Lampe Halo" }, "description": { "type": "string" }, "priceEUR": { "type": "number", "minimum": 0, "description": "Prix unitaire en euros.", "example": 89 }, "category": { "type": "string", "enum": ["luminaire", "mobilier", "accessoire"] }, "inStock": { "type": "boolean" } } },
+      "ProductList": { "type": "object", "required": ["data", "meta"], "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/Product" } }, "meta": { "type": "object", "required": ["total", "currency"], "properties": { "total": { "type": "integer", "description": "Nombre de produits correspondant au filtre, avant la limite." }, "currency": { "type": "string", "enum": ["EUR"] } } } } },
+      "Customer": { "type": "object", "required": ["email"], "additionalProperties": false, "properties": { "email": { "type": "string", "format": "email", "maxLength": 254, "description": "Adresse fictive du client.", "example": "camille@example.com" } } },
+      "OrderItemInput": { "type": "object", "required": ["productId", "quantity"], "additionalProperties": false, "properties": { "productId": { "type": "string", "description": "Un identifiant du catalogue Atelier.", "example": "prd_01" }, "quantity": { "type": "integer", "minimum": 1, "maximum": 99, "example": 1 } } },
+      "OrderInput": { "type": "object", "required": ["customer", "items"], "additionalProperties": false, "properties": { "customer": { "$ref": "#/components/schemas/Customer" }, "items": { "type": "array", "minItems": 1, "maxItems": 20, "items": { "$ref": "#/components/schemas/OrderItemInput" } }, "currency": { "type": "string", "enum": ["EUR"], "default": "EUR", "description": "Devise de la commande ; seule EUR est prise en charge." } } },
+      "OrderItem": { "type": "object", "required": ["productId", "name", "quantity", "unitPriceEUR", "lineTotalEUR"], "properties": { "productId": { "type": "string" }, "name": { "type": "string" }, "quantity": { "type": "integer" }, "unitPriceEUR": { "type": "number" }, "lineTotalEUR": { "type": "number" } } },
+      "Order": { "type": "object", "required": ["id", "status", "customer", "items", "total", "currency"], "properties": { "id": { "type": "string", "description": "Identifiant fixe de démonstration ; la commande n’est pas conservée.", "example": "ord_demo_01" }, "status": { "type": "string", "enum": ["confirmed"] }, "customer": { "$ref": "#/components/schemas/Customer" }, "items": { "type": "array", "items": { "$ref": "#/components/schemas/OrderItem" } }, "total": { "type": "number", "description": "Montant total en euros.", "example": 125 }, "currency": { "type": "string", "enum": ["EUR"] } } },
+      "Error": { "type": "object", "required": ["error"], "properties": { "error": { "type": "object", "required": ["code", "message"], "properties": { "code": { "type": "string" }, "message": { "type": "string" }, "details": { "type": "array", "items": { "type": "object", "required": ["path", "message"], "properties": { "path": { "type": "string" }, "message": { "type": "string" } } } } } } } }
+    },
+    "responses": {
+      "ValidationError": { "description": "Un paramètre ou le corps de la requête est invalide.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" }, "example": { "error": { "code": "validation_error", "message": "La requête contient des données invalides.", "details": [{ "path": "items[0].quantity", "message": "La quantité doit être un entier de 1 à 99." }] } } } } },
+      "NotFound": { "description": "Le produit demandé n’existe pas.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" }, "example": { "error": { "code": "not_found", "message": "Le produit demandé n’existe pas." } } } } },
+      "ServerError": { "description": "Une erreur inattendue est survenue.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" }, "example": { "error": { "code": "internal_error", "message": "Une erreur inattendue est survenue." } } } } }
+    }
+  }
+}
