@@ -10,11 +10,12 @@ const spec = {
   openapi: '3.1.1',
   info: { title: 'Fixture API', version: '1.0.0' },
   servers: [{ url: `${location.origin}/api` }],
-  ...(scenario === 'apikey' ? {
+  ...(['apikey', 'profiles', 'profilesPending', 'snippets'].includes(scenario) ? {
     security: [{ FixtureKey: [] }],
     components: { securitySchemes: { FixtureKey: { type: 'apiKey', in: 'header', name: 'X-Fixture-Key' } } },
   } : {}),
   paths: {
+    ...(scenario === 'profiles' ? { '/next': { get: { operationId: 'nextOperation', summary: 'Autre opération', responses: { '200': { description: 'OK' } } } } } : {}),
     [operationPath]: {
       get: {
         operationId: 'fixtureOperation', summary: 'Opération de test',
@@ -29,6 +30,7 @@ declare global {
   interface Window {
     fixtureRequests: PreparedRequest[];
     fixtureAborted: number;
+    fixtureCopied: string;
   }
 }
 window.fixtureRequests = [];
@@ -38,12 +40,16 @@ const response: RequestResult = { status: 200, statusText: 'OK', duration: 1, he
 const transport: Transport = (request, signal) => {
   window.fixtureRequests.push(request);
   signal?.addEventListener('abort', () => { window.fixtureAborted++; }, { once: true });
-  if (scenario === 'pending' || scenario === 'timeout') return new Promise(resolve => { resolvePending = resolve; });
+  if (scenario === 'pending' || scenario === 'timeout' || scenario === 'profilesPending') return new Promise(resolve => { resolvePending = resolve; });
   return Promise.resolve(response);
 };
 const props: ApiReferenceProps = {
   spec,
-  ...(scenario === 'custom' || scenario === 'simulation' || scenario === 'pending' || scenario === 'timeout' ? { transport } : {}),
+  ...(['profiles', 'profilesPending', 'invalidProfiles'].includes(scenario) ? { serverProfiles: [
+    { id: 'local', label: 'Développement', url: `${location.origin}/local`, description: 'Serveur local de test.' },
+    { id: 'staging', label: 'Staging', url: scenario === 'invalidProfiles' ? 'https://user:secret@staging.example.test/api' : 'https://staging.example.test/api' },
+  ] } : {}),
+  ...(['custom', 'simulation', 'pending', 'timeout', 'profilesPending'].includes(scenario) ? { transport } : {}),
   ...(scenario === 'simulation' ? { transportMode: 'simulation' as const } : {}),
   ...(scenario === 'timeout' ? { requestTimeoutMs: 100 } : {}),
   ...(scenario === 'invalidTimeout' ? { requestTimeoutMs: 0 } : {}),
@@ -51,6 +57,6 @@ const props: ApiReferenceProps = {
 };
 
 createRoot(document.getElementById('root')!).render(<StrictMode>
-  {(scenario === 'pending' || scenario === 'timeout') && <button type="button" onClick={() => resolvePending?.(response)}>Terminer le transport de test</button>}
+  {['pending', 'timeout', 'profilesPending'].includes(scenario) && <button type="button" onClick={() => resolvePending?.(response)}>Terminer le transport de test</button>}
   <ApiReference {...props} />
 </StrictMode>);

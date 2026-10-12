@@ -1,0 +1,12 @@
+.sp-reference .sp-guided-body .sp-editor-heading { flex-wrap: wrap; }
+.sp-reference .sp-guided-body .sp-editor-heading .sp-required { font-size: 10px; color: var(--sp-muted); font-weight: 400; }
+.sp-reference .sp-json-actions { display: flex; flex-wrap: wrap; gap: 8px 14px; padding: 10px 12px; border: 1px solid var(--sp-rule); border-bottom: 0; background: var(--sp-input); }
+.sp-reference .sp-json-actions > button { display: inline-flex; align-items: center; gap: 5px; min-height: 28px; padding: 0; border: 0; background: transparent; color: var(--sp-muted); font-size: 11px; text-align: left; }
+.sp-reference .sp-json-actions > button:hover:not(:disabled) { color: var(--sp-ink); text-decoration: underline; text-underline-offset: 3px; }
+.sp-reference .sp-json-actions > button:disabled { opacity: .5; cursor: not-allowed; }
+.sp-reference .sp-json-actions > .sp-json-reset { margin-left: auto; }
+.sp-reference .sp-json-validation { color: var(--sp-muted); font-size: 11px; line-height: 1.65; margin-top: 9px; overflow-wrap: anywhere; }
+.sp-reference .sp-json-validation-error { color: var(--sp-error); }
+.sp-reference .sp-json-action-notice { display: block; color: var(--sp-muted); margin-top: 3px; }
+.sp-reference .sp-guided-body .sp-json-editor[aria-invalid='true'] { border-color: var(--sp-error); }
+.sp-reference .sp-json-validation-scope, .sp-reference .sp-json-example-hint { color: var(--sp-muted); font-size: 10px; line-height: 1.65; margin-top: 5px; overflow-wrap: anywhere; }

@@ -36,11 +36,12 @@ try {
       devDependencies: { ...manifest.devDependencies, '@types/react': entry.reactTypes, '@types/react-dom': entry.reactDomTypes },
     }, null, 2));
     await writeFile(join(consumer, 'src', 'public-contracts.tsx'), `
-import { ApiReference, buildRequest, parseSpec, toCurl } from '@specanto/react';
-import type { ApiReferenceProps, NormalizedSpec, Operation, PreparedRequest, RequestInput, RequestResult, Schema, Transport } from '@specanto/react';
+import { ApiReference, buildRequest, normalizeServerProfiles, parseSpec, toCurl, toFetch, toPython } from '@specanto/react';
+import type { ApiReferenceProps, NormalizedSpec, Operation, PreparedRequest, RequestInput, RequestResult, Schema, ServerProfile, Transport } from '@specanto/react';
 import { spec } from './spec';
 
-const objectSource: ApiReferenceProps = { spec, logo: <span>Consumer</span>, monoFontFamily: 'monospace', requestTimeoutMs: 5000 };
+const profiles: ServerProfile[] = [{ id: 'dev', label: 'Development', url: 'https://api.example.com' }];
+const objectSource: ApiReferenceProps = { spec, serverProfiles: profiles, logo: <span>Consumer</span>, monoFontFamily: 'monospace', requestTimeoutMs: 5000 };
 const textSource: ApiReferenceProps = { spec: JSON.stringify(spec) };
 const urlSource: ApiReferenceProps = { specUrl: '/openapi.json' };
 // @ts-expect-error The component requires exactly one specification source.
@@ -49,6 +50,8 @@ const noSource: ApiReferenceProps = { title: 'Missing input' };
 const bothSources: ApiReferenceProps = { spec, specUrl: '/openapi.json' };
 // @ts-expect-error Custom request timeouts accept numbers only.
 const wrongTimeout: ApiReferenceProps = { spec, requestTimeoutMs: '5000' };
+// @ts-expect-error Server profiles require a stable identifier and URL.
+const wrongProfile: ServerProfile = { label: 'Missing fields' };
 // @ts-expect-error Transport results must include status, headers and body.
 const wrongTransport: Transport = async () => ({ status: 200 });
 
@@ -61,7 +64,7 @@ const operation: Operation = normalized.operations[0];
 const input: RequestInput = { serverUrl: 'https://api.example.com', parameterValues: {}, credentials: {}, credentialOrigins: {} };
 const request: PreparedRequest = buildRequest(operation, input);
 const schema: Schema = { type: 'string' };
-void [objectSource, textSource, urlSource, noSource, bothSources, wrongTimeout, wrongTransport, toCurl(request), schema];
+void [objectSource, textSource, urlSource, noSource, bothSources, wrongTimeout, wrongTransport, wrongProfile, normalizeServerProfiles(profiles), toCurl(request), toFetch(request), toPython(request), schema];
 export const reference = <ApiReference spec={spec} transport={transport} transportMode="simulation" />;
 `);
     await writeFile(join(consumer, 'runtime-check.ts'), `
@@ -80,7 +83,7 @@ if (!html.includes('Consumer reference') || !html.includes('sp-reference')) thro
     await command(['bun', 'run', 'runtime-check.ts'], consumer);
     const assets = await Array.fromAsync(new Bun.Glob('dist/assets/*.css').scan(consumer));
     const css = (await Promise.all(assets.map((asset) => readFile(join(consumer, asset), 'utf8')))).join('\n');
-    if (!css.includes('.sp-reference') || !css.includes('--sp-mono')) throw new Error('Consumer build is missing the exported Specanto CSS');
+    if (!css.includes('.sp-reference') || !css.includes('--sp-mono') || !css.includes('.sp-guided-body')) throw new Error('Consumer build is missing the exported Specanto CSS');
     console.log(`React ${entry.react}: public TypeScript contract, runtime peer, Vite build and exported CSS verified.`);
   }
 } finally {

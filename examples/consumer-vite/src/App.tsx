@@ -1,7 +1,12 @@
 import { ApiReference } from '@specanto/react';
-import type { Transport } from '@specanto/react';
+import type { ServerProfile, Transport } from '@specanto/react';
 import '@specanto/react/styles.css';
 import { spec } from './spec';
+
+const serverProfiles: ServerProfile[] = [
+  { id: 'development', label: 'Development · simulation', url: 'https://api.example.com/v1' },
+  { id: 'staging', label: 'Staging · simulation', url: 'https://staging.example.com/v1' },
+];
 
 const simulate: Transport = async (request, signal) => {
   if (signal?.aborted) throw new DOMException('Requête annulée', 'AbortError');
@@ -32,6 +37,7 @@ export function App() {
     fontFamily="Arial, sans-serif"
     monoFontFamily="Menlo, Consolas, monospace"
     requestTimeoutMs={5000}
+    serverProfiles={serverProfiles}
     transport={simulate}
     transportMode="simulation"
   />;

@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { ApiReference } from '../src';
+import { ApiReference, type ServerProfile } from '../src';
 import { Icon } from '../src/ui/Icon';
 import { ImportDialog } from './ImportDialog';
 
 const github = 'https://github.com/SergenYUKSEL/Specanto';
+const atelierProfiles: ServerProfile[] = [{ id: 'atelier', label: 'Atelier · démo active', url: `${window.location.origin}/api`, description: 'API fictive hébergée avec cette démonstration.' }];
 
 export function App() {
   const isDemo = window.location.pathname.replace(/\/$/, '') === '/demo';
@@ -26,7 +27,7 @@ function Demo() {
         <button className="theme-button" onClick={() => setMode(m => m === 'light' ? 'dark' : 'light')} aria-label={mode === 'light' ? 'Activer le mode sombre' : 'Activer le mode clair'}><Icon name={mode === 'light' ? 'moon' : 'sun'} size={22} /></button>
       </div>
     </header>
-    <ApiReference key={revision} {...input} colorMode={mode} />
+    <ApiReference key={revision} {...input} colorMode={mode} serverProfiles={'specUrl' in input && input.specUrl === '/openapi.json' ? atelierProfiles : undefined} />
     <footer className="demo-footnote">API fictive. Requêtes HTTP réelles. Aucune commande conservée. <button onClick={reset}>Revenir à Atelier</button></footer>
     {importing && <ImportDialog onClose={() => setImporting(false)} onImport={value => { setInput(value); setRevision(v => v + 1); setImporting(false); }} />}
   </div>;

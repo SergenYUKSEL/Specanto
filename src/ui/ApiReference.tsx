@@ -1,9 +1,10 @@
 import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import Markdown from 'react-markdown';
 import { Icon } from './Icon';
+import { JsonBodyEditor } from './JsonBodyEditor';
 import { describeRequestTimeout, resolveRequestTimeout } from './request-timeout';
-import { buildRequest, exampleForSchema, httpTransport, loadSpec, parseSpec, searchOperations, toCurl } from '../core';
-import type { ApiResponse, NormalizedSpec, Operation, Parameter, PreparedRequest, RequestResult, Schema, Transport } from '../core/types';
+import { buildRequest, exampleForSchema, httpTransport, loadSpec, normalizeServerProfiles, parseSpec, searchOperations, toCurl, toFetch, toPython } from '../core';
+import type { ApiResponse, NormalizedSpec, Operation, Parameter, PreparedRequest, RequestResult, Schema, ServerProfile, Transport } from '../core/types';
 
 type SpecSource = { spec: object | string; specUrl?: never } | { spec?: never; specUrl: string };
 export type ApiReferenceProps = SpecSource & {
@@ -16,6 +17,7 @@ export type ApiReferenceProps = SpecSource & {
   logo?: ReactNode;
   /** Maximum request duration in milliseconds. Integer from 100 to 300000; default 45000. */
   requestTimeoutMs?: number;
+  serverProfiles?: ServerProfile[];
   transport?: Transport;
   transportMode?: 'http' | 'simulation';
 };
@@ -160,12 +162,14 @@ function OperationDocs({ operation, apiTitle, idPrefix, onNotice }: { operation:
   </article>;
 }
 
-function RequestPanel({ operation, sourceUrl, transport, transportLabel, credentials, setCredentials, idPrefix, onNotice, requestTimeoutMs }: {
+function RequestPanel({ operation, sourceUrl, transport, transportLabel, credentials, setCredentials, idPrefix, onNotice, requestTimeoutMs, serverProfiles, selectedProfileId, onSelectProfile }: {
   operation: Operation; sourceUrl?: string; transport: Transport; transportLabel: string; credentials: Credentials; idPrefix: string;
   requestTimeoutMs?: number;
+  serverProfiles?: ServerProfile[]; selectedProfileId?: string | null; onSelectProfile: (id: string | null) => void;
   setCredentials: (credentials: Credentials) => void; onNotice: (notice: string) => void;
 }) {
-  const [serverUrl, setServerUrl] = useState(operation.servers[0]?.url ?? '/');
+  const [specServerUrl, setSpecServerUrl] = useState(operation.servers[0]?.url ?? '/');
+  const [customServerUrl, setCustomServerUrl] = useState('');
   const [parameterValues, setParameterValues] = useState<Record<string, string>>(() => parameterDefaults(operation));
   const [body, setBody] = useState(() => operation.requestBody ? json(example(operation.requestBody.schema, operation.requestBody.example)) : '');
   const [customServer, setCustomServer] = useState(false);
@@ -174,11 +178,18 @@ function RequestPanel({ operation, sourceUrl, transport, transportLabel, credent
   const [error, setError] = useState('');
   const [pending, setPending] = useState(false);
   const [responseView, setResponseView] = useState<'body' | 'headers'>('body');
+  const [snippetLanguage, setSnippetLanguage] = useState<'cURL' | 'Fetch' | 'Python'>('cURL');
   const controller = useRef<AbortController | null>(null);
   const mounted = useRef(true);
   let timeoutMs = resolveRequestTimeout(undefined);
   let timeoutError = '';
   try { timeoutMs = resolveRequestTimeout(requestTimeoutMs); } catch (cause) { timeoutError = message(cause); }
+  let profiles: ServerProfile[] = [];
+  let profileError = '';
+  try { profiles = normalizeServerProfiles(serverProfiles, sourceUrl); } catch (cause) { profileError = `Configuration des profils invalide : ${message(cause)}`; }
+  const activeProfile = selectedProfileId === null ? undefined : profiles.find(profile => profile.id === selectedProfileId) ?? profiles[0];
+  const serverUrl = customServer ? customServerUrl : activeProfile?.url ?? specServerUrl;
+  const configurationError = timeoutError || profileError;
   const baseUrl = sourceUrl;
   let origin = '';
   let destination: string;
@@ -193,16 +204,17 @@ function RequestPanel({ operation, sourceUrl, transport, transportLabel, credent
   useEffect(() => {
     if (credentials.origin !== origin) setCredentials({ origin, values: {} });
   }, [origin, credentials.origin, setCredentials]);
+  useEffect(() => { controller.current?.abort(); setResult(null); setError(''); }, [serverUrl]);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; controller.current?.abort(); }; }, []);
   const credentialOrigins = Object.fromEntries(Object.keys(credentials.values).map((name) => [name, credentials.origin]));
   const requestInput = { serverUrl, parameterValues, body: operation.requestBody ? body : undefined, credentials: credentials.values, credentialOrigins, authAlternative, baseUrl };
   let prepared: PreparedRequest | undefined;
-  try { prepared = buildRequest(operation, requestInput); } catch { /* Incomplete forms are validated on manual submission. */ }
+  try { if (!configurationError) prepared = buildRequest(operation, requestInput); } catch { /* Incomplete forms are validated on manual submission. */ }
   const requirement = operation.security[authAlternative] ?? {};
   const authNames = Object.keys(requirement);
   const send = async () => {
     if (controller.current) return;
-    if (timeoutError) { setError(timeoutError); return; }
+    if (configurationError) { setError(configurationError); return; }
     let request: PreparedRequest;
     try { request = buildRequest(operation, requestInput); } catch (cause) { setError(message(cause)); return; }
     const abort = new AbortController();
@@ -223,7 +235,8 @@ function RequestPanel({ operation, sourceUrl, transport, transportLabel, credent
     <div className="sp-panel-heading"><div><span className="sp-panel-indicator" aria-hidden="true" /><h2>Essayer cette route</h2></div><span className="sp-live-label">{transportLabel}</span></div>
     <p className="sp-panel-help">{transportLabel === 'Simulation' ? 'Les requêtes utilisent une simulation. Les réponses ne proviennent pas d’un serveur HTTP.' : transportLabel === 'Transport personnalisé' ? 'Le transport fourni par votre application exécute la requête et renvoie la réponse.' : 'Envoyez une requête et inspectez la réponse de votre API.'}</p>
     <form onSubmit={(event) => { event.preventDefault(); void send(); }}>
-      <div className="sp-server-field"><div className="sp-server-heading"><label htmlFor={`${idPrefix}-server`}>Serveur</label><button type="button" className="sp-text-button" onClick={() => { setCustomServer(!customServer); if (customServer) setServerUrl(operation.servers[0]?.url ?? '/'); }}>{customServer ? 'Serveurs de la spécification' : 'Autre serveur'}</button></div>{customServer ? <input id={`${idPrefix}-server`} value={serverUrl} onChange={(event) => setServerUrl(event.target.value)} placeholder="https://api.exemple.fr" spellCheck={false} autoComplete="off" /> : <select id={`${idPrefix}-server`} value={serverUrl} onChange={(event) => setServerUrl(event.target.value)}>{(operation.servers.length ? operation.servers : [{ url: '/' }]).map((server, index) => <option value={server.url} key={`${server.url}:${index}`}>{server.description ?? server.url}</option>)}</select>}{!sourceUrl && !/^[a-z][a-z\d+.-]*:/i.test(serverUrl) && <p className="sp-field-hint sp-relative-server-hint">Ce fichier local utilise un serveur relatif. Choisissez « Autre serveur » et saisissez son URL absolue.</p>}</div>
+      {profiles.length > 0 && <div className="sp-profile-field"><label htmlFor={`${idPrefix}-profile`}>Profil de serveur</label><select id={`${idPrefix}-profile`} value={activeProfile?.id ?? ''} onChange={event => { onSelectProfile(event.target.value || null); setCustomServer(false); }}><option value="">Spécification OpenAPI</option>{profiles.map(profile => <option key={profile.id} value={profile.id}>{profile.label}</option>)}</select>{activeProfile?.description && !customServer && <p className="sp-field-hint">{activeProfile.description}</p>}</div>}
+      <div className="sp-server-field"><div className="sp-server-heading"><label htmlFor={`${idPrefix}-server`}>Serveur</label><button type="button" className="sp-text-button" onClick={() => { if (!customServer) setCustomServerUrl(serverUrl); setCustomServer(!customServer); }}>{customServer ? activeProfile ? 'Revenir au profil' : 'Serveurs de la spécification' : 'Autre serveur'}</button></div>{customServer ? <input id={`${idPrefix}-server`} value={customServerUrl} onChange={(event) => setCustomServerUrl(event.target.value)} placeholder="https://api.exemple.fr" spellCheck={false} autoComplete="off" /> : activeProfile ? <input id={`${idPrefix}-server`} value={activeProfile.url} readOnly /> : <select id={`${idPrefix}-server`} value={specServerUrl} onChange={(event) => setSpecServerUrl(event.target.value)}>{(operation.servers.length ? operation.servers : [{ url: '/' }]).map((server, index) => <option value={server.url} key={`${server.url}:${index}`}>{server.description ?? server.url}</option>)}</select>}{!sourceUrl && !/^[a-z][a-z\d+.-]*:/i.test(serverUrl) && <p className="sp-field-hint sp-relative-server-hint">Ce fichier local utilise un serveur relatif. Choisissez « Autre serveur » et saisissez son URL absolue.</p>}</div>
       <div className="sp-destination"><Method method={operation.method} /><code title={prepared?.url ?? destination}>{prepared?.url ?? destination}</code></div>
       {operation.security.length > 0 && <details className="sp-form-group sp-auth-group" open={authNames.length > 0}><summary>Authentification <span>{authNames.length ? authNames.join(' + ') : 'publique'}</span><span className="sp-disclosure-icons"><Icon name="plus" size={14} /><Icon name="minus" size={14} /></span></summary>
         {operation.security.length > 1 && <label className="sp-input-field">Méthode d’authentification<select value={authAlternative} onChange={(event) => setAuthAlternative(Number(event.target.value))}>{operation.security.map((alternative, index) => <option value={index} key={index}>{Object.keys(alternative).join(' + ') || 'Accès public'}</option>)}</select></label>}
@@ -240,12 +253,12 @@ function RequestPanel({ operation, sourceUrl, transport, transportLabel, credent
         if (!parameters.length) return null;
         return <details className="sp-form-group" open key={location}><summary>{location === 'path' ? 'Paramètres du chemin' : location === 'query' ? 'Paramètres de recherche' : 'En-têtes'}<span>{parameters.length}</span><span className="sp-disclosure-icons"><Icon name="plus" size={14} /><Icon name="minus" size={14} /></span></summary>{parameters.map((parameter) => <label className="sp-input-field" key={parameterKey(parameter)}><span><code>{parameter.name}</code>{parameter.required ? <span className="sp-required">requis</span> : <span className="sp-optional">facultatif</span>}</span><input value={parameterValues[parameterKey(parameter)] ?? ''} onChange={(event) => setParameterValues({ ...parameterValues, [parameterKey(parameter)]: event.target.value })} placeholder={schemaType(parameter.schema)} spellCheck={false} autoComplete="off" aria-describedby={parameter.description ? `${idPrefix}-hint-${location}-${parameter.name}` : undefined} />{parameter.description && <span id={`${idPrefix}-hint-${location}-${parameter.name}`} className="sp-field-hint">{parameter.description}</span>}</label>)}</details>;
       })}
-      {operation.requestBody && <div className="sp-request-body"><div className="sp-editor-heading"><label htmlFor={`${idPrefix}-json-body`}>Corps</label><span>{operation.requestBody.mediaType}</span><button type="button" className="sp-text-button" onClick={() => { setBody(json(example(operation.requestBody?.schema, operation.requestBody?.example))); setError(''); }}>Réinitialiser</button></div><textarea id={`${idPrefix}-json-body`} className="sp-json-editor" value={body} onChange={(event) => setBody(event.target.value)} spellCheck={false} autoComplete="off" aria-label="Corps JSON de la requête" /></div>}
+      {operation.requestBody && <JsonBodyEditor id={`${idPrefix}-json-body`} value={body} onChange={value => { setBody(value); setError(''); }} schema={operation.requestBody.schema} rawSchema={operation.requestBody.rawSchema} required={operation.requestBody.required} example={operation.requestBody.example} mediaType={operation.requestBody.mediaType} onNotice={onNotice} onReset={() => { setBody(json(example(operation.requestBody?.schema, operation.requestBody?.example))); setError(''); }} />}
       {operation.unsupported.length > 0 && <p className="sp-notice">Cette route utilise des paramètres non pris en charge. Consultez les notes dans la documentation.</p>}
-      <div className="sp-send-row"><button type="submit" className="sp-send" disabled={pending || Boolean(timeoutError) || operation.unsupported.length > 0}>{pending ? <><span className="sp-spinner" aria-hidden="true" />Envoi en cours…</> : <>Envoyer la requête<Icon name="arrow" /></>}</button>{pending && <button type="button" className="sp-cancel" onClick={() => controller.current?.abort()}>Annuler</button>}</div>
-      {(timeoutError || error) && <div className="sp-request-error" role="alert">{timeoutError || error}</div>}
+      <div className="sp-send-row"><button type="submit" className="sp-send" disabled={pending || Boolean(configurationError) || operation.unsupported.length > 0}>{pending ? <><span className="sp-spinner" aria-hidden="true" />Envoi en cours…</> : <>Envoyer la requête<Icon name="arrow" /></>}</button>{pending && <button type="button" className="sp-cancel" onClick={() => controller.current?.abort()}>Annuler</button>}</div>
+      {(configurationError || error) && <div className="sp-request-error" role="alert">{configurationError || error}</div>}
     </form>
-    {prepared && <details className="sp-curl"><summary>Requête cURL<span>sans secrets</span></summary><CodeBlock value={toCurl(prepared)} label="Requête cURL sans secrets" onNotice={onNotice} /></details>}
+    {prepared && <details className="sp-curl"><summary>Exemples de code<span>sans secrets</span></summary><div className="sp-snippet-tabs" role="group" aria-label="Langage de l’exemple">{(['cURL', 'Fetch', 'Python'] as const).map(language => <button type="button" key={language} aria-pressed={snippetLanguage === language} onClick={() => setSnippetLanguage(language)}>{language}</button>)}</div><CodeBlock value={snippetLanguage === 'Fetch' ? toFetch(prepared) : snippetLanguage === 'Python' ? toPython(prepared) : toCurl(prepared)} label={`Exemple ${snippetLanguage} sans secrets`} onNotice={onNotice} /><p className="sp-snippet-hint">{snippetLanguage === 'Python' ? 'Python requiert le package requests. Son délai de 45 s porte sur la connexion et la lecture, pas sur la durée totale.' : 'Cet exemple reflète le formulaire. Il n’est exécuté qu’après copie dans votre application.'} Les corps et paramètres restent inclus.</p></details>}
     <section className="sp-real-response" aria-label={transportLabel === 'HTTP réel' ? 'Réponse HTTP réelle' : transportLabel === 'Simulation' ? 'Réponse simulée' : 'Résultat du transport personnalisé'} aria-live="polite"><div className="sp-real-response-heading"><h3>Réponse</h3>{result && <div className="sp-response-meta"><span className={result.status < 400 ? 'sp-response-ok' : 'sp-response-failed'}>{result.status} {result.statusText}</span><span>{Math.round(result.duration)} ms</span></div>}</div>
       {result ? <><div className="sp-result-tabs" role="group" aria-label="Vue de la réponse"><button type="button" aria-pressed={responseView === 'body'} onClick={() => setResponseView('body')}>Corps</button><button type="button" aria-pressed={responseView === 'headers'} onClick={() => setResponseView('headers')}>En-têtes <span>{Object.keys(result.headers).length}</span></button><CopyButton value={responseView === 'body' ? displayBody : json(result.headers)} label="Copier la réponse" onNotice={onNotice} /></div>{responseView === 'body' ? result.body ? <pre className="sp-response-content" tabIndex={0}><code><JsonCode value={displayBody} /></code></pre> : <p className="sp-empty-response">{result.status === 204 ? '204 No Content : le serveur a répondu sans corps.' : 'Le serveur a répondu sans corps.'}</p> : <dl className="sp-response-headers">{Object.entries(result.headers).map(([name, value]) => <div key={name}><dt>{name}</dt><dd>{value}</dd></div>)}</dl>}{result.truncated && <p className="sp-notice">La réponse est tronquée car elle dépasse la limite d’affichage.</p>}</> : <div className="sp-response-placeholder"><Icon name={pending ? 'ellipsis' : 'braces'} size={24} className="sp-response-placeholder-icon" /><p>{pending ? 'En attente du serveur…' : 'La réponse apparaîtra ici.'}</p><span>{pending ? 'Vous pouvez annuler la requête.' : 'Aucune requête envoyée pour cette route.'}</span></div>}
     </section>
@@ -267,6 +280,7 @@ export function ApiReference(props: ApiReferenceProps) {
   const [specRevision, setSpecRevision] = useState(0);
   const [mode, setMode] = useState(props.colorMode ?? 'light');
   const [systemDark, setSystemDark] = useState(false);
+  const [selectedProfileId, setSelectedProfileId] = useState<string | null>();
   const search = useRef<HTMLInputElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const applySpec = (next: NormalizedSpec) => {
@@ -307,7 +321,7 @@ export function ApiReference(props: ApiReferenceProps) {
   const navigate = (id: string) => { setSelectedId(id); setOverview(false); setNavOpen(false); window.history.replaceState(null, '', operationHash(id)); };
   const importFile = async (file?: File) => {
     if (!file) return;
-    try { applySpec(parseSpec(await file.text())); setNotice(`${file.name} importé.`); } catch (cause) { setImportError(`Import impossible : ${message(cause)}`); }
+    try { applySpec(parseSpec(await file.text())); setSelectedProfileId(null); setNotice(`${file.name} importé.`); } catch (cause) { setImportError(`Import impossible : ${message(cause)}`); }
     if (fileInput.current) fileInput.current.value = '';
   };
   return <div className="sp-reference" data-color-mode={dark ? 'dark' : 'light'} data-theme={props.theme ?? 'editorial'} style={styles}>
@@ -321,7 +335,7 @@ export function ApiReference(props: ApiReferenceProps) {
       </div>
       <div className="sp-nav-bottom"><button type="button" className="sp-import-button" onClick={() => fileInput.current?.click()}><Icon name="upload" size={16} />Importer une spécification</button><input className="sp-sr-only" ref={fileInput} type="file" accept=".json,.yaml,.yml,application/json,application/yaml,text/yaml" aria-label="Importer un fichier OpenAPI JSON ou YAML" onChange={(event) => { void importFile(event.target.files?.[0]); }} />{importError && <p className="sp-import-error" role="alert">{importError}</p>}<div className="sp-nav-footnote"><span>OpenAPI {spec ? '3.1.x' : ''}</span><button type="button" className="sp-theme-toggle" onClick={() => setMode(dark ? 'light' : 'dark')} aria-label={dark ? 'Activer le thème clair' : 'Activer le thème sombre'} title={dark ? 'Thème clair' : 'Thème sombre'}><Icon name={dark ? 'sun' : 'moon'} size={17} /></button></div></div>
     </nav>
-    {loading ? <main className="sp-state"><span className="sp-spinner" aria-hidden="true" /><h1>Chargement de la spécification</h1><p>Préparation de la documentation…</p></main> : loadError ? <main className="sp-state sp-state-error" role="alert"><h1>Cette spécification ne peut pas être ouverte.</h1><p>{loadError}</p><button type="button" onClick={() => fileInput.current?.click()}>Importer un fichier OpenAPI</button></main> : !spec?.operations.length ? <main className="sp-state"><h1>Aucune route documentée.</h1><p>Ajoutez des opérations dans la section paths de votre spécification OpenAPI.</p><button type="button" onClick={() => fileInput.current?.click()}>Importer une autre spécification</button></main> : overview ? <main className="sp-overview sp-documentation"><div className="sp-breadcrumb">Référence API <span aria-hidden="true">/</span> Introduction</div><h1>{props.title ?? spec.title}</h1><p className="sp-overview-version">Version {spec.version}</p><Prose>{spec.description || 'Explorez les routes, consultez leurs schémas et envoyez une requête depuis la documentation.'}</Prose><section className="sp-doc-section"><div className="sp-section-heading"><h2>Explorer l’API</h2><span>{spec.operations.length} routes</span></div>{spec.operations.map((item) => <button className="sp-overview-operation" type="button" key={item.id} onClick={() => navigate(item.id)}><Method method={item.method} /><code>{item.path}</code><span>{item.summary}</span><Icon name="arrow" size={18} /></button>)}</section>{spec.warnings.length > 0 && <details className="sp-warnings"><summary>Notes de la spécification ({spec.warnings.length})</summary><ul>{spec.warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul></details>}</main> : operation ? <main className="sp-workspace"><OperationDocs key={`docs:${specRevision}:${operation.id}`} operation={operation} apiTitle={props.title ?? spec.title} idPrefix={idPrefix} onNotice={setNotice} /><RequestPanel key={`request:${specRevision}:${operation.id}`} operation={operation} sourceUrl={spec.sourceUrl} transport={props.transport ?? httpTransport} transportLabel={props.transportMode === 'simulation' ? 'Simulation' : props.transportMode === 'http' || !props.transport || props.transport === httpTransport ? 'HTTP réel' : 'Transport personnalisé'} credentials={credentials} setCredentials={setCredentials} idPrefix={idPrefix} onNotice={setNotice} requestTimeoutMs={props.requestTimeoutMs} /></main> : null}
+    {loading ? <main className="sp-state"><span className="sp-spinner" aria-hidden="true" /><h1>Chargement de la spécification</h1><p>Préparation de la documentation…</p></main> : loadError ? <main className="sp-state sp-state-error" role="alert"><h1>Cette spécification ne peut pas être ouverte.</h1><p>{loadError}</p><button type="button" onClick={() => fileInput.current?.click()}>Importer un fichier OpenAPI</button></main> : !spec?.operations.length ? <main className="sp-state"><h1>Aucune route documentée.</h1><p>Ajoutez des opérations dans la section paths de votre spécification OpenAPI.</p><button type="button" onClick={() => fileInput.current?.click()}>Importer une autre spécification</button></main> : overview ? <main className="sp-overview sp-documentation"><div className="sp-breadcrumb">Référence API <span aria-hidden="true">/</span> Introduction</div><h1>{props.title ?? spec.title}</h1><p className="sp-overview-version">Version {spec.version}</p><Prose>{spec.description || 'Explorez les routes, consultez leurs schémas et envoyez une requête depuis la documentation.'}</Prose><section className="sp-doc-section"><div className="sp-section-heading"><h2>Explorer l’API</h2><span>{spec.operations.length} routes</span></div>{spec.operations.map((item) => <button className="sp-overview-operation" type="button" key={item.id} onClick={() => navigate(item.id)}><Method method={item.method} /><code>{item.path}</code><span>{item.summary}</span><Icon name="arrow" size={18} /></button>)}</section>{spec.warnings.length > 0 && <details className="sp-warnings"><summary>Notes de la spécification ({spec.warnings.length})</summary><ul>{spec.warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul></details>}</main> : operation ? <main className="sp-workspace"><OperationDocs key={`docs:${specRevision}:${operation.id}`} operation={operation} apiTitle={props.title ?? spec.title} idPrefix={idPrefix} onNotice={setNotice} /><RequestPanel key={`request:${specRevision}:${operation.id}`} operation={operation} sourceUrl={spec.sourceUrl} transport={props.transport ?? httpTransport} transportLabel={props.transportMode === 'simulation' ? 'Simulation' : props.transportMode === 'http' || !props.transport || props.transport === httpTransport ? 'HTTP réel' : 'Transport personnalisé'} credentials={credentials} setCredentials={setCredentials} idPrefix={idPrefix} onNotice={setNotice} requestTimeoutMs={props.requestTimeoutMs} serverProfiles={props.serverProfiles} selectedProfileId={selectedProfileId} onSelectProfile={setSelectedProfileId} /></main> : null}
     <div className="sp-sr-only" role="status" aria-live="polite" aria-atomic="true">{notice}</div>
   </div>;
 }

@@ -15,6 +15,7 @@ export type Schema = {
   [key: string]: unknown;
 };
 export type Server = { url: string; description?: string };
+export type ServerProfile = { id: string; label: string; url: string; description?: string };
 export type Parameter = {
   name: string;
   in: 'path' | 'query' | 'header' | 'cookie';

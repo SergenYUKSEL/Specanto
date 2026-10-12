@@ -176,6 +176,14 @@
 .sp-reference .sp-live-label { font: 11px var(--sp-mono); color: var(--sp-muted); white-space: nowrap; }
 .sp-reference .sp-panel-help { margin-top: 13px; font-size: 13px; color: var(--sp-muted); line-height: 1.6; max-width: 280px; }
 .sp-reference .sp-server-field { margin-top: 27px; }
+.sp-reference .sp-profile-field { margin-top: 24px; }
+.sp-reference .sp-profile-field > label { display: block; font-size: 11px; font-weight: 550; margin-bottom: 7px; }
+.sp-reference .sp-profile-field .sp-field-hint { margin-top: 7px; }
+.sp-reference .sp-profile-field + .sp-server-field { margin-top: 15px; }
+.sp-reference .sp-snippet-tabs { display: flex; gap: 6px; margin-top: 13px; flex-wrap: wrap; }
+.sp-reference .sp-snippet-tabs > button { background: transparent; border: 1px solid var(--sp-rule); padding: 6px 10px; font: 11px var(--sp-mono); }
+.sp-reference .sp-snippet-tabs > button[aria-pressed='true'] { border-color: var(--sp-ink); background: var(--sp-input); }
+.sp-reference .sp-snippet-hint { margin-top: 10px; color: var(--sp-muted); font-size: 10px; line-height: 1.7; }
 .sp-reference .sp-server-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 11px; font-weight: 550; margin-bottom: 7px; }
 .sp-reference .sp-relative-server-hint { margin-top: 10px; }
 .sp-reference select, .sp-reference .sp-input-field > input, .sp-reference .sp-server-field > input { width: 100%; min-width: 0; background: var(--sp-input); color: var(--sp-ink); border: 1px solid var(--sp-rule); padding: 10px 11px; min-height: 39px; border-radius: 0; font-size: 13px; }

@@ -1,6 +1,6 @@
 # Packaged React consumer
 
-This standalone Vite application imports `@specanto/react` and its exported CSS from a local package archive. It has no aliases or imports into the library source. The example supplies a custom SVG logo, both font families, an accent color, a five-second request timeout and an explicitly labeled simulation transport.
+This standalone Vite application imports `@specanto/react` and its exported CSS from a local package archive. It has no aliases or imports into the library source. The example supplies a custom SVG logo, both font families, an accent color, a five-second request timeout two server profiles and an explicitly labeled simulation transport. Both profile destinations are examples; the injected simulation sends no network request.
 
 From the repository root, create the archive:
 
