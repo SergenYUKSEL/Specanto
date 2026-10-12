@@ -2,8 +2,13 @@
 
 ## 0.1.0 — unreleased
 
+Repository update: 13 October 2026.
+
 ### Added
 
+- Local JSON/YAML specification comparison through `SpecComparison` and `compareSpecs`, with request/response-aware change classifications, review filters and explicit comparison limits.
+- Memory-only session history for the latest 20 request outcomes and up to 100 operation favorites, with explicit clearing and reset on specification import or reload. History excludes submitted parameters, headers and bodies; opening an entry only navigates to its documentation.
+- Configurable French/English reference UI, known validation diagnostics, session controls and comparison screen. OpenAPI-authored content stays in its original language.
 - cURL/Fetch/Python selector with current-form examples, secret-header redaction and copy actions.
 - Integrator-defined server profiles that persist across operations, with credential clearing on origin changes and cancellation on destination changes.
 - Guided JSON body editor with field-path diagnostics, manual formatting that preserves literals and manual example insertion.
@@ -15,4 +20,4 @@
 - Chromium/mobile WebKit checks, React 18/19 packaged consumer example, GitHub CI and private vulnerability reporting.
 - Library declarations/CSS exports, contribution and compatibility documentation, and local archive installation.
 
-This version is available from the repository and local archive. It has not been published to npm.
+This version is available from the repository and local archive. It has not been published to npm, and the project license remains undecided.

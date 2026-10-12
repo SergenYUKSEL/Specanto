@@ -10,7 +10,7 @@ Specanto turns an OpenAPI document into a searchable React reference with a manu
 
 Version `0.1.0` is a local package in development. `@specanto/react` is the working package name; the manifest is private and the package has not been published to npm. You can build and install a local tarball today.
 
-The repository also contains a showcase at `/` and an interactive demo at `/demo`. The demo uses the fictional Atelier shop API, with real HTTP requests:
+The repository also contains a showcase at `/`, an interactive demo at `/demo` and a local OpenAPI comparison screen at `/compare`. The demo uses the fictional Atelier shop API, with real HTTP requests:
 
 | Operation | Purpose |
 | --- | --- |
@@ -72,7 +72,7 @@ import { ApiReference } from '@specanto/react';
 import '@specanto/react/styles.css';
 
 export function Documentation() {
-  return <ApiReference specUrl="/openapi.json" colorMode="light" />;
+  return <ApiReference specUrl="/openapi.json" locale="en" colorMode="light" />;
 }
 ```
 
@@ -87,6 +87,7 @@ Pass exactly one of `spec` and `specUrl`.
 | `spec` | An OpenAPI object, JSON text or YAML text |
 | `specUrl` | URL of an OpenAPI document; relative URLs work in the browser |
 | `title` | Optional displayed title |
+| `locale` | `fr` or `en`; default `fr`. Changes interface labels and known library diagnostics; OpenAPI content stays as authored. |
 | `logo` | Optional React node for the desktop/mobile brand |
 | `theme` | The current theme is `editorial` |
 | `colorMode` | `light`, `dark` or `system` |
@@ -102,9 +103,28 @@ See [customization](./docs/customization.md) for branding, fonts, scoped CSS and
 
 Documents loaded by URL resolve relative API servers against their source URL. Documents passed as objects/text or imported from local files need absolute HTTP(S) API server URLs. Operation links use `#operation/{operationId}` with a URL-encoded ID.
 
-The public entry also exports `parseSpec`, `loadSpec`, `searchOperations`, `exampleForSchema`, `buildRequest`, `toCurl`, `toFetch`, `toPython`, `normalizeServerProfiles`, `httpTransport` and their associated types. `src/core` has no React dependency. See the [compatibility matrix](./docs/compatibility.md) before integrating an API with advanced schemas or serialization.
+The public entry also exports `SpecComparison`, `compareSpecs`, `parseSpec`, `loadSpec`, `searchOperations`, `exampleForSchema`, `buildRequest`, `toCurl`, `toFetch`, `toPython`, `normalizeServerProfiles`, `httpTransport` and their associated types, including `ReferenceLocale` and `SpecDiffReport`. `src/core` has no React dependency. See the [compatibility matrix](./docs/compatibility.md) before integrating an API with advanced schemas or serialization.
 
 The console generates cURL, Fetch and Python examples from the current form, with known secret headers redacted. The JSON body editor provides field-path diagnostics, manual formatting and manual example insertion; it shares the engine’s partial validation constraints. Profiles and snippets never trigger requests automatically.
+
+## Session and comparison
+
+The navigation's Session panel keeps up to 20 request-history entries and 100 favorite operation IDs in component memory. History contains the operation ID, method, template path, server origin, status or classified outcome, duration and timestamp. It excludes submitted path/query values, headers, request bodies, response bodies and raw errors. Both lists can be cleared and reset when the specification changes, a file is imported, or the component is reloaded/remounted. No browser storage is used. Opening an entry navigates to documentation without replaying its request.
+
+The standalone comparison component reads two local JSON/YAML files and compares them on an explicit click:
+
+```tsx
+import { SpecComparison } from '@specanto/react';
+import '@specanto/react/styles.css';
+
+export function VersionReview() {
+  return <SpecComparison locale="en" colorMode="light" />;
+}
+```
+
+`SpecComparison` accepts `locale: 'fr' | 'en'` (default `fr`) and `colorMode: 'light' | 'dark'` (default `light`). For an application-owned workflow, call `compareSpecs(before, after)` with two `NormalizedSpec` values returned by `parseSpec` or `loadSpec`. It returns changes, warnings, severity counts and a `truncated` flag.
+
+Comparison matches operations by method and path, then reviews parameters, primary request/response media types, schema constraints and security. It is a heuristic review aid, not a full compatibility guarantee. Servers and documentation metadata are excluded. Reports are limited to 500 changes, traversal depth 16 and 20,000 work visits; truncated counts describe only returned changes. Advanced schemas and unresolved references need manual review. Files stay in memory, with no upload or API execution. See [comparison details](./docs/customization.md#specification-comparison).
 
 ## Check a change
 
@@ -124,7 +144,7 @@ The individual commands are `bun run lint`, `bun run typecheck`, `bun run test`,
 
 The public showcase and demo deploy from this repository with the Railway CLI. The React library is installed separately into the consuming application.
 
-[Live showcase](https://specanto-demo-production.up.railway.app) · [Interactive demo](https://specanto-demo-production.up.railway.app/demo)
+[Live showcase](https://specanto-demo-production.up.railway.app) · [Interactive demo](https://specanto-demo-production.up.railway.app/demo) · [OpenAPI comparison](https://specanto-demo-production.up.railway.app/compare)
 
 - Project: `agile-dream` (`e7e1ab33-b677-4537-bb14-c43201359ef5`).
 - Environment: `production` (`a1e0cb54-c0a1-481e-92b4-7853b4c8d561`).
@@ -139,7 +159,7 @@ railway up --project e7e1ab33-b677-4537-bb14-c43201359ef5 \
   --service ac4e2b9e-b881-45bc-b75f-34d4952b9bc1 --detach
 ```
 
-Railway builds the root Dockerfile with Bun 1.3.14 and runs the stateless server. The service uses `PORT=3000`, the same port as its generated domain, and `/health` as its startup healthcheck. Verify the deployment status and the public `/health`, `/demo` and `/api/products` endpoints after deployment. An upload alone does not confirm a healthy deployment.
+Railway builds the root Dockerfile with Bun 1.3.14 and runs the stateless server. The service uses `PORT=3000`, the same port as its generated domain, and `/health` as its startup healthcheck. Verify the deployment status and the public `/health`, `/demo`, `/compare` and `/api/products` endpoints after deployment. An upload alone does not confirm a healthy deployment.
 
 The browser suite can target a production container or the live service:
 

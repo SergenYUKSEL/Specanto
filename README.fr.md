@@ -10,7 +10,7 @@ Specanto transforme une description OpenAPI en documentation React interactive :
 
 La version `0.1.0` est un package local en développement. `@specanto/react` est son nom provisoire. Le manifeste est privé et le package n’est pas publié sur npm ; son installation se fait actuellement depuis une archive construite localement.
 
-La vitrine est disponible sur `/`, et la démo sur `/demo`. La démo utilise Atelier, une boutique fictive d’objets design :
+La vitrine est disponible sur `/`, la démo sur `/demo` et la comparaison locale OpenAPI sur `/compare`. La démo utilise Atelier, une boutique fictive d’objets design :
 
 | Opération | Fonction |
 | --- | --- |
@@ -65,7 +65,7 @@ import { ApiReference } from '@specanto/react';
 import '@specanto/react/styles.css';
 
 export function Documentation() {
-  return <ApiReference specUrl="/openapi.json" colorMode="light" />;
+  return <ApiReference specUrl="/openapi.json" locale="fr" colorMode="light" />;
 }
 ```
 
@@ -77,11 +77,32 @@ Fournissez exactement une entrée : `spec` (objet ou texte JSON/YAML) ou `specUr
 
 `logo` remplace la marque sur ordinateur et mobile. `fontFamily` et `monoFontFamily` configurent les deux familles ; votre application charge les polices. `requestTimeoutMs` accepte un entier de 100 à 300 000 ms, avec 45 000 ms par défaut. Une valeur invalide bloque l’envoi. Le [guide de personnalisation](./docs/customization.md) montre aussi les variables CSS limitées au composant.
 
+`locale` accepte `fr` ou `en`, avec `fr` par défaut. Il change les libellés de l’interface et les diagnostics connus de la bibliothèque. Les titres, descriptions, noms de champs et exemples du document OpenAPI restent dans leur langue d’origine ; les diagnostics inconnus sont conservés tels quels.
+
 Un [exemple Vite permanent](https://github.com/SergenYUKSEL/Specanto/tree/main/examples/consumer-vite) utilise le package installé depuis son archive et un transport de simulation explicite.
 
 ## Console enrichie
 
 La console propose des exemples cURL, Fetch et Python à copier, avec les en-têtes secrets masqués. `serverProfiles` fournit des destinations nommées, indépendantes du fichier OpenAPI : le choix reste actif entre les routes, et les identifiants sont effacés quand l’origine change. L’éditeur JSON affiche les erreurs au chemin du champ et propose un formatage ainsi qu’un exemple sur clic. Aucune de ces actions n’envoie une requête automatiquement.
+
+## Session et comparaison
+
+Le panneau Session conserve en mémoire jusqu’à 20 entrées d’historique et 100 identifiants d’opérations favorites. L’historique contient uniquement l’opération, sa méthode et son chemin modèle, l’origine du serveur, le statut ou la catégorie du résultat, la durée et la date. Il exclut les valeurs des paramètres, les en-têtes, les corps de requête/réponse et les erreurs brutes. Les listes sont effaçables et réinitialisées au changement de spécification, à l’import, au rechargement ou au remontage du composant. Aucun stockage navigateur n’est utilisé. Ouvrir une entrée affiche la documentation sans rejouer la requête.
+
+Le composant exporté `SpecComparison` lit deux fichiers JSON/YAML locaux et lance leur comparaison sur clic :
+
+```tsx
+import { SpecComparison } from '@specanto/react';
+import '@specanto/react/styles.css';
+
+export function Comparaison() {
+  return <SpecComparison locale="fr" colorMode="light" />;
+}
+```
+
+Ses options sont `locale: 'fr' | 'en'` (`fr` par défaut) et `colorMode: 'light' | 'dark'` (`light` par défaut). Le moteur `compareSpecs(before, after)` accepte deux `NormalizedSpec`, produits par `parseSpec` ou `loadSpec`, et retourne les changements, avertissements, compteurs par catégorie et `truncated`.
+
+La revue compare méthodes/chemins, paramètres, types de contenu principaux des requêtes/réponses, contraintes de schéma et sécurité. Elle reste heuristique et ne certifie pas toute la compatibilité d’une API. Les serveurs et métadonnées documentaires sont exclus. Limites : 500 changements, profondeur 16 et 20 000 visites de parcours ; si `truncated` vaut `true`, les compteurs portent uniquement sur les changements retournés. Schémas avancés et références non résolues demandent une vérification manuelle. Les fichiers restent en mémoire, sans envoi ni exécution de requête API. Le [guide d’intégration](./docs/customization.md#specification-comparison) précise ce périmètre.
 
 ## Vérifier les changements
 
@@ -99,14 +120,14 @@ Consultez la [matrice de compatibilité](./docs/compatibility.md) pour les limit
 
 ## Déploiement de la vitrine et de la démo
 
-[Vitrine en ligne](https://specanto-demo-production.up.railway.app) · [Démo interactive](https://specanto-demo-production.up.railway.app/demo)
+[Vitrine en ligne](https://specanto-demo-production.up.railway.app) · [Démo interactive](https://specanto-demo-production.up.railway.app/demo) · [Comparaison OpenAPI](https://specanto-demo-production.up.railway.app/compare)
 
 Le déploiement se fait depuis ce dépôt via la CLI Railway, sur le [projet choisi](https://railway.com/project/e7e1ab33-b677-4537-bb14-c43201359ef5?environmentId=a1e0cb54-c0a1-481e-92b4-7853b4c8d561) :
 
 - Projet `agile-dream` : `e7e1ab33-b677-4537-bb14-c43201359ef5`.
 - Environnement `production` : `a1e0cb54-c0a1-481e-92b4-7853b4c8d561`.
 
-Le service est `specanto-demo` (`ac4e2b9e-b881-45bc-b75f-34d4952b9bc1`). Le [README anglais](./README.md#deployment) contient la commande avec sa cible explicite. Railway construit le Dockerfile avec Bun 1.3.14. Le serveur stateless utilise `PORT=3000`, comme le domaine public, et `/health` comme vérification de démarrage. Vérifiez l’état du déploiement puis les chemins publics `/health`, `/demo` et `/api/products`.
+Le service est `specanto-demo` (`ac4e2b9e-b881-45bc-b75f-34d4952b9bc1`). Le [README anglais](./README.md#deployment) contient la commande avec sa cible explicite. Railway construit le Dockerfile avec Bun 1.3.14. Le serveur stateless utilise `PORT=3000`, comme le domaine public, et `/health` comme vérification de démarrage. Vérifiez l’état du déploiement puis les chemins publics `/health`, `/demo`, `/compare` et `/api/products`.
 
 ## Licence
 

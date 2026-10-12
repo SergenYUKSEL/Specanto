@@ -83,7 +83,26 @@ Railway deployment `c5154620-19e4-49f0-8263-1ebf02f4fa5a` reached **SUCCESS**. S
 
 GitHub CI run `38310775016` was blocked before any step started. GitHub's annotation reports a recent account payment failure or a spending limit requiring review in Billing & plans. The local checks passed; this follow-up does not claim a successful GitHub run and makes no billing changes.
 
-The remaining feature proposals are specification comparisons, session history/favorites and a configurable FR/EN interface. No npm publication or license adoption is included in this follow-up.
+Specification comparisons, session history/favorites and configurable FR/EN labels were the next feature proposals at that point. They are implemented in the follow-up below. No npm publication or license adoption is included.
+
+## Comparison, session and language follow-up — 13 October 2026
+
+The three remaining proposals are implemented. `SpecComparison` reads two local OpenAPI 3.1 JSON/YAML documents, groups and filters additions, removals, potential incompatibilities and other changes. `compareSpecs` is exported for normalized documents. The report names fields that become required and treats newly documented response statuses on an existing operation as potentially breaking. Its bounded, partial comparison is not a full compatibility certificate; unsupported semantics and incomplete traversal produce review notes.
+
+The reference offers up to 100 operation favorites and the latest 20 completed/cancelled/failed request metadata entries. History retains the operation's template path, server origin, status/outcome, timestamp and duration, excluding parameter values, headers, bodies, responses and full URLs. Opening an entry navigates to documentation without replaying it. Import, specification replacement, unmount and reload discard the session. No browser storage is used.
+
+`locale="fr" | "en"` configures interface labels and known diagnostics, with French as the default. Changing language retains the active form and pending request. Authored OpenAPI content remains unchanged. The demo includes a language control and a separate `/compare` screen; all decorative controls continue using SVG icons.
+
+| Follow-up check | Observed result |
+| --- | --- |
+| Frozen installation, lint, TypeScript and whitespace | Passed |
+| Unit/integration suite | 224 passed |
+| Runtime/font notice verification | 88 packages verified |
+| Library and demo production builds | Passed |
+| Packaged consumer matrix | React 18.2 and 19.3 passed, including comparison/locale exports and session/comparison CSS |
+| `CI=true bun run test:e2e` against the production build | 106 passed across desktop Chromium and WebKit iPhone |
+
+Browser coverage includes comparison filters and localized field changes, translated import errors, favorite clearing, metadata-only history and navigation without replay. An isolated StrictMode host verifies locale changes during requests, cancellation, spec replacement, file import, unmount and ignored late completions. Desktop/mobile previews and new comparison/session screenshots are included.
 
 ## Distribution and remaining scope
 
@@ -91,4 +110,4 @@ The local archive is `output/specanto-react-0.1.0.tgz`. It contains JS, CSS, Typ
 
 Publication to npm, adopting the proposed license and control of the npm scope remain separate decisions. The completed integration/verification work and proposed extra features are recorded in the roadmap. Advanced JSON Schema validation, external references, OAuth/OIDC, multipart, streaming and multi-API portals are outside this release. The [compatibility matrix](./compatibility.md) records the current behavior and protection limits.
 
-The [roadmap](../ROADMAP.md) records shipped MVP integration options, verification and CI, remaining publication decisions, and [proposed future features](./features.md).
+The [roadmap](../ROADMAP.md) records shipped integration options, verification and CI, remaining publication decisions, and the six [delivered feature extensions](./features.md).

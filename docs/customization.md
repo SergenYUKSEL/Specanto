@@ -12,6 +12,7 @@ export function Reference() {
       specUrl="/openapi.json"
       title="Atelier API"
       logo={<span aria-label="Atelier">atelier</span>}
+      locale="en"
       colorMode="system"
       accentColor="#FF5A36"
       fontFamily="Archivo, system-ui, sans-serif"
@@ -23,6 +24,12 @@ export function Reference() {
 ```
 
 Your application supplies and loads the chosen fonts. The demo self-hosts Archivo and IBM Plex Mono; these font assets are not part of the React library archive.
+
+## Interface language
+
+`ApiReference` accepts `locale="fr"` or `locale="en"`, with French as the default. The exported `ReferenceLocale` type describes these values. Locale changes interface labels, accessibility names and known library diagnostics. OpenAPI titles, descriptions, parameter/property names and examples remain exactly as authored; unknown diagnostics and user-supplied values remain unchanged. The core helpers exported by the package do not accept a locale option.
+
+Changing locale does not import the document again, reset the session, or send/cancel a business request. The demo's language selector exposes the same prop. Supply multilingual OpenAPI content yourself when the document needs translation.
 
 ## Logo and fonts
 
@@ -75,3 +82,46 @@ The console offers cURL, Fetch and Python examples built from the current valid 
 Python examples require the external `requests` package. Their 45-second timeout covers connection/read inactivity, rather than the component's total request deadline. Fetch examples do not include an automatic timeout; an application can supply its own AbortSignal. These snippets are generated text, never executed by Specanto.
 
 The JSON editor diagnoses syntax and the engine's supported schema constraints, displaying the first error's field path when available. “Formater JSON” adds whitespace while retaining number literals, escapes and duplicate keys; invalid input stays unchanged. “Générer un exemple” inserts an authored example when available, otherwise a bounded schema example. These actions require a click. Advanced constraints still require server-side validation.
+
+## Session history and favorites
+
+The navigation includes a collapsible Session panel. Favorite buttons save operation IDs only, with a maximum of 100 valid unique IDs. Favorites belong to the current specification and component instance; they do not restore a previous form or its credentials.
+
+Up to 20 settled requests are listed, newest first. Each history entry contains an internal ID, operation ID, HTTP method, template path, HTTP(S) server origin, optional response status, classified outcome, rounded duration and timestamp. Outcomes cover responses, cancellation, timeout, network failure and custom-transport failure. A full request URL, substituted path values, query/fragment values, credentials, headers, request/response bodies and raw error messages are never retained by the history.
+
+Both lists stay in React memory. They use no cookies, `localStorage`, `sessionStorage` or remote persistence, and reset on specification change, successful local import, reload or component remount. Each list has an explicit clear action. Clearing history does not cancel an active request; that request can add a new entry when it settles. Selecting a favorite or history entry opens its documentation only: the user must explicitly send any new request. There is no request replay.
+
+## Specification comparison
+
+The public React component provides a standalone local-file review screen:
+
+```tsx
+import { SpecComparison } from '@specanto/react';
+import '@specanto/react/styles.css';
+
+export function ComparisonScreen() {
+  return <SpecComparison locale="en" colorMode="dark" />;
+}
+```
+
+`SpecComparisonProps` contains `locale?: 'fr' | 'en'` (default `fr`) and `colorMode?: 'light' | 'dark'` (default `light`). Unlike `ApiReference`, it has no `system` color mode or `spec`/`specUrl` prop. Its styles are scoped to `.sp-comparison` and included in the shared CSS export. The public demo is available at [OpenAPI comparison](https://specanto-demo-production.up.railway.app/compare).
+
+Choose a before and after OpenAPI 3.1 JSON/YAML file, then click Compare. Each file has the parser's 2 MiB and depth-32 bounds. Selecting a replacement file clears the previous result. Files are parsed in the browser, retained in component memory and removable with Clear files; no document upload or API request occurs.
+
+For application-owned sources, normalize the two documents before using the pure comparison helper:
+
+```ts
+import { compareSpecs, parseSpec, type SpecDiffReport } from '@specanto/react';
+
+export function reviewVersions(beforeDocument: object | string, afterDocument: object | string): SpecDiffReport {
+  return compareSpecs(parseSpec(beforeDocument), parseSpec(afterDocument));
+}
+```
+
+The exact helper signature is `compareSpecs(before: NormalizedSpec, after: NormalizedSpec): SpecDiffReport`. `parseSpec` accepts an object or JSON/YAML text; explicitly calling `loadSpec` is another way to obtain a normalized document from a URL. `compareSpecs` itself makes no network calls and does not mutate either source.
+
+Operations are matched by method and path, independently of `operationId`. The compared subset includes parameters and their serialization/requirement flags, request-body requirements, response statuses, each normalized primary request/response media type, schema types/properties/required fields/enums/bounds, and authentication alternatives/schemes. Secondary media types, servers and documentation metadata such as descriptions, examples and defaults are excluded. Advanced JSON Schema keywords are compared conservatively, without evaluating their full semantics; unresolved/external/cyclic references and boolean schemas produce review warnings.
+
+The returned report includes `changes`, `warnings`, `summary` and `truncated`. Each change has a method, path, pointer-like location, category code, fixed explanation and severity (`added`, `removed`, `potentially-breaking` or `changed`); required-field transitions can additionally include `beforeRequired`/`afterRequired`. Reports do not copy example values, enum values or credentials. Schema/operation paths and field names still come from the supplied documents.
+
+The report holds at most 500 changes and traversal is bounded by depth 16 and 20,000 work visits. Reaching a limit or traversal cycle sets `truncated` and adds a warning; summary counts refer only to returned changes. Classification is heuristic: even an empty, untruncated report cannot certify complete API compatibility. Review the original documents and the warnings before integrating a changed API.

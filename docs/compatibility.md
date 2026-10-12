@@ -13,6 +13,10 @@ This is a bounded first implementation of an OpenAPI reference and browser HTTP 
 | Missing, cyclic or external `$ref` | Warnings retain unresolved information. External references are never fetched. Unresolved references in request parameters or bodies prevent execution; response schemas remain inspectable. |
 | Reference expansion | Maximum depth 32 and expansion budget 100,000 nodes. Reaching a limit leaves unresolved information and a warning. |
 | Navigation | Operations from the standard HTTP method fields, tag groups, case-insensitive word search and hash links by operation ID. |
+| Interface language | `ApiReference.locale`: `fr` or `en`, default `fr`. Labels, accessibility names and known library diagnostics are localized; OpenAPI content and unknown diagnostics stay as supplied. |
+| Session history | At most 20 settled requests in component memory. Records operation ID/method/template path, server origin, status or classified outcome, duration and timestamp; excludes submitted values, headers, bodies and raw errors. Opening an entry only navigates to documentation. |
+| Favorites | At most 100 valid unique operation IDs in component memory. No request values, persistence or replay. |
+| Session reset | History and favorites can be cleared and reset on specification change, successful import, reload or component remount. No cookies or browser storage. |
 | Servers | Operation server overrides path server, then document server. Declared server-variable defaults are substituted; remaining variables prevent execution. |
 | Server profiles | Optional integrator-provided profiles, validated as a whole, selected across operations. Relative URLs require the loaded document source; origin changes clear credentials. No persistence or automatic request. |
 | Relative servers | For a URL-loaded document, resolve against its source URL. An object/text/file input needs an explicit base in the low-level request API; the component currently requires absolute API server URLs for those inputs. |
@@ -43,6 +47,25 @@ This is a bounded first implementation of an OpenAPI reference and browser HTTP 
 
 The Atelier demo server has its own validation: email shape, supported product IDs, quantity from 1 to 99, one to twenty order lines, EUR currency, documented fields only and a 16 KiB request-body limit. These are demo-server rules, rather than a promise that the library validates those schema keywords for every API.
 
+## Specification comparison
+
+| Feature | Current behavior |
+| --- | --- |
+| Public APIs | `SpecComparison` and `compareSpecs`, with exported component/report/change/code/severity types. |
+| Component options | `locale?: 'fr' \| 'en'`, default `fr`; `colorMode?: 'light' \| 'dark'`, default `light`. No `system` mode or programmatic document prop. |
+| Component inputs | Two local OpenAPI 3.1 JSON/YAML files. Each retains the parser's 2 MiB/depth-32 bounds. Explicit comparison action, memory only, no upload or API execution. |
+| Core signature | `compareSpecs(before: NormalizedSpec, after: NormalizedSpec): SpecDiffReport`. Obtain inputs with `parseSpec` or an explicit `loadSpec` call. Comparison itself performs no fetch and does not mutate its inputs. |
+| Operation matching | HTTP method and path, independent of operation ID. Additions and removals are reported. |
+| Compared subset | Parameters and serialization/requirement flags, request-body requirements, response statuses, normalized primary request/response media types, schema types/properties/required fields/enums/bounds, authentication alternatives and schemes. |
+| Primary media only | Normalization selects the first JSON or `+json` media type, otherwise the first available type. Changes confined to secondary media types may not appear. |
+| Exclusions | Servers and documentation metadata, including descriptions, examples and defaults. No full OpenAPI or JSON Schema equivalence assessment. |
+| Advanced schemas | Additional keywords are compared conservatively; full combinator/conditional semantics are not evaluated. Boolean schemas and unresolved/external/cyclic references require manual review and produce warnings. |
+| Report limits | 500 returned changes, depth 16, 20,000 traversal/work visits. A traversal cycle or reached bound sets `truncated` and adds a warning. Counts describe returned changes only. |
+| Result categories | `added`, `removed`, `potentially-breaking`, `changed`. Classification is heuristic; an empty report does not certify compatibility. |
+| Report contents | Method/path, pointer-like location, code, fixed explanation, severity and optional required-field transition flags. No copied examples, enum values or credentials. Document paths and field names remain visible. |
+
+The public [comparison screen](https://specanto-demo-production.up.railway.app/compare) exposes this subset. See [integration examples](./customization.md#specification-comparison) for the component and helper.
+
 ## Authentication and transport
 
 | Feature | Current behavior |
@@ -51,6 +74,7 @@ The Atelier demo server has its own validation: email shape, supported product I
 | Security inheritance | Document security is inherited unless the operation overrides it. An empty requirement `{}` permits unauthenticated execution. |
 | Alternatives and combinations | The user selects an OR alternative; every scheme inside that alternative is required (AND). Unsupported schemes block that selected alternative. Malformed security declarations block execution. |
 | Credential scope | Credentials are held in component memory and bound to an origin. The request builder refuses mismatches with the final destination. |
+| Session data | Request history and favorites add no credential storage. History stores metadata only; favorites store operation IDs only. |
 | URLs | HTTP(S) only. Usernames/passwords in URLs are rejected. A relative URL requires a base. |
 | Browser fetch | Direct requests to the chosen API, no Specanto proxy. The API must permit browser access via CORS. Cookies are omitted. |
 | Redirects | Redirects are rejected for requests containing known secret headers; unauthenticated requests follow redirects. |

@@ -1,6 +1,8 @@
 # Specanto roadmap
 
-Status checked against the current code and verification results on 12 October 2026. The functional MVP and integration/verification follow-up are available. Remaining distribution decisions are listed separately from shipped features.
+Status checked against the current code and verification results on 13 October 2026. The functional MVP, integration options and all six proposed feature additions are implemented in the repository. Remaining distribution decisions are listed separately from shipped features.
+
+Verification: 224 unit/integration tests, 106 Chromium/mobile WebKit checks against the production build, and the React 18.2/19.3 packaged consumer checks passed.
 
 ## Delivered first slice
 
@@ -10,7 +12,7 @@ Status checked against the current code and verification results on 12 October 2
 - [x] Bearer and API-key header construction, memory-only credentials, origin binding and redacted cURL.
 - [x] Responsive operation screen, light/dark themes and SVG icons.
 - [x] Fictional Atelier API, stateless demo server, public showcase and Railway CLI deployment.
-- [x] 175 unit/integration tests, 86 Chromium/mobile WebKit browser checks, and React 18.2/19.3 packaged consumers with strict TypeScript verification.
+- [x] 224 unit/integration tests, 106 Chromium/mobile WebKit checks, and React 18.2/19.3 packaged consumers with strict TypeScript verification.
 
 ## Priority 1: finish the MVP integration options
 
@@ -40,13 +42,16 @@ Status checked against the current code and verification results on 12 October 2
 - [x] README desktop/mobile screenshots and the first unreleased changelog entry.
 - [ ] Publish an explicitly approved package to npm for registry-based Bun/npm/pnpm installation.
 
-## Additional feature proposals
+## Delivered feature additions
 
 - [x] Current-form cURL/Fetch/Python examples with secret-header redaction and copy actions.
 - [x] Integrator-provided server profiles with selection across operations, origin-bound credential clearing and active-request cancellation.
 - [x] Guided JSON editor with first-error field paths, manual literal-preserving formatting and manual authored/generated examples.
+- [x] Local specification comparison with operation, parameter, primary-media, schema and authentication changes; potentially breaking classifications, filters and visible traversal/result limits.
+- [x] Memory-only history of the latest 20 request outcomes and up to 100 operation favorites. History retains operation templates and result metadata, excludes submitted parameters/headers/bodies, and only navigates back to documentation.
+- [x] Configurable French/English interface, known validation diagnostics, session controls and comparison screen, while preserving the language of OpenAPI-authored content.
 
-The [feature backlog](./docs/features.md) retains specification comparisons, session history/favorites and configurable FR/EN UI as proposals.
+All six original feature proposals are implemented. Their current behavior and boundaries are described in the [feature overview](./docs/features.md).
 
 ## Later, optional scope
 
