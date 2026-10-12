@@ -79,6 +79,10 @@ JSON formatting is manual and preserves number literals, escapes and duplicate k
 
 Verification: 175 unit/integration tests passed, 86 Chromium/mobile WebKit checks passed against the production demo build, and the packaged consumers passed with React 18.2 and 19.3. The consumer check includes the new profile type, snippet exports and guided-editor CSS. Desktop/mobile screenshots were refreshed. An independent review identified an isolated UTF-16 surrogate case in Python output; it was reproduced, corrected and tested. Sparse profile arrays are also rejected rather than causing a rendering failure.
 
+Railway deployment `c5154620-19e4-49f0-8263-1ebf02f4fa5a` reached **SUCCESS**. Sixteen selected browser journeys passed against the public demo (plus two isolated snippet-copy fixture checks), covering real GET/POST, responsive layouts, file import and JSON actions. Public Fetch/Python secret-header redaction was additionally checked with Chromium and WebKit iPhone.
+
+GitHub CI run `38310775016` was blocked before any step started. GitHub's annotation reports a recent account payment failure or a spending limit requiring review in Billing & plans. The local checks passed; this follow-up does not claim a successful GitHub run and makes no billing changes.
+
 The remaining feature proposals are specification comparisons, session history/favorites and a configurable FR/EN interface. No npm publication or license adoption is included in this follow-up.
 
 ## Distribution and remaining scope
