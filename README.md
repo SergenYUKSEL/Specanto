@@ -55,8 +55,6 @@ On desktop, drag the separators between navigation, documentation and the reques
 
 Width choices stay in component memory through navigation/theme changes and reset on reload. They are not stored in the browser. Mobile retains the stacked layout without draggable separators. Long navigation labels wrap instead of scrolling horizontally.
 
-Version 0.3.0 is being prepared for publication.
-
 ![Resizable panels](./docs/screenshots/resizable-panels.png)
 
 ## Start local documentation (CLI from 0.2.0)

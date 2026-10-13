@@ -67,7 +67,8 @@ All six original feature proposals are implemented. Their current behavior and b
 - [x] Resize navigation and console with pointers or keyboard, bounded to preserve the document, with reset and drag cancellation.
 - [x] Keep widths in component memory, preserve form/pending requests and use the stacked/mobile layout in narrow spaces.
 - [x] Verify all 132 production-build browser journeys on Chromium and WebKit.
-- [ ] Publish 0.3.0 and update the Railway demo.
+- [x] Deploy and verify the resizable reference on the existing Railway demo.
+- [ ] Publish 0.3.0 and verify registry installation.
 
 ## Later, optional scope
 

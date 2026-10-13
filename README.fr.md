@@ -48,8 +48,6 @@ Sur ordinateur, tirez les séparateurs entre la navigation, la documentation et 
 
 Les tailles restent en mémoire pendant l’utilisation du composant, même après un changement de route ou de thème. Elles sont réinitialisées au rechargement et ne sont pas enregistrées dans le navigateur. Sur mobile, la présentation reste empilée, sans séparateur à tirer. Les libellés longs du menu reviennent à la ligne.
 
-La version 0.3.0 est en préparation de publication.
-
 ![Panneaux redimensionnables](./docs/screenshots/resizable-panels.png)
 
 ## Créer une documentation locale (CLI à partir de 0.2.0)
