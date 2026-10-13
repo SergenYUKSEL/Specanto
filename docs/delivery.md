@@ -130,6 +130,10 @@ The parser now accepts OpenAPI 3.0.x and 3.1.x JSON/YAML/object/URL inputs. 3.0 
 
 The CLI reports `ENEEDAUTH` for `npm whoami`, and the author confirmed that no npm account exists yet. The package lookup returns 404, which does not establish ownership or availability of the `@specanto` scope. The candidate is ready for account setup and scope verification; no account, organization, registry version, tag or GitHub release was created. The release guide includes the exact-archive publication and post-publication verification steps.
 
+GitHub CI run `38366349782` for candidate commit `334860a` was blocked before any step started. Its annotation reports an account payment failure or spending limit requiring review in Billing & plans. The local checks passed; no GitHub success or billing change is claimed.
+
+Railway deployment `52dd235b-ee8d-43b8-a2cf-7a438022f533` reached **SUCCESS** on the existing production service. Twenty-two selected browser journeys passed against the public site on Chromium and WebKit iPhone, covering 3.0 JSON import/nullable requests through a controlled intercepted endpoint, 3.0 YAML URL loading, mixed 3.0/3.1 comparisons, responsive layouts, navigation and real Atelier GET/POST. Public pages, health, OpenAPI and products returned HTTP 200; the page references the locally verified production bundle. No new Railway project or service was created.
+
 ## Distribution and remaining scope
 
 The local archive is `output/specanto-react-0.1.0.tgz`. It contains JS, CSS, TypeScript declarations, the adopted MIT LICENSE and integration/compatibility documentation. The package name is provisional; the manifest is now prepared for public npm publication.
