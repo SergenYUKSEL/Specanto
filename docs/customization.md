@@ -106,7 +106,7 @@ export function ComparisonScreen() {
 
 `SpecComparisonProps` contains `locale?: 'fr' | 'en'` (default `fr`) and `colorMode?: 'light' | 'dark'` (default `light`). Unlike `ApiReference`, it has no `system` color mode or `spec`/`specUrl` prop. Its styles are scoped to `.sp-comparison` and included in the shared CSS export. The public demo is available at [OpenAPI comparison](https://specanto-demo-production.up.railway.app/compare).
 
-Choose a before and after OpenAPI 3.1 JSON/YAML file, then click Compare. Each file has the parser's 2 MiB and depth-32 bounds. Selecting a replacement file clears the previous result. Files are parsed in the browser, retained in component memory and removable with Clear files; no document upload or API request occurs.
+Choose a before and after OpenAPI 3.0 or 3.1 JSON/YAML file, then click Compare. Mixed-version pairs use normalized schemas, so equivalent nullable representations do not appear as changes. Each file has the parser's 2 MiB and depth-32 bounds. Selecting a replacement file clears the previous result. Files are parsed in the browser, retained in component memory and removable with Clear files; no document upload or API request occurs.
 
 For application-owned sources, normalize the two documents before using the pure comparison helper:
 

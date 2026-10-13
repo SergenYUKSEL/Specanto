@@ -6,13 +6,15 @@ Repository update: 13 October 2026.
 
 ### Added
 
+- OpenAPI 3.0.x JSON/YAML/object/URL input, nullable schema normalization, 3.0 reference-sibling semantics and source-version display; mixed 3.0/3.1 comparisons use normalized schemas.
+- Adopted root MIT license and public npm publication metadata. Registry publication remains pending publisher authentication and scope access.
 - Local JSON/YAML specification comparison through `SpecComparison` and `compareSpecs`, with request/response-aware change classifications, review filters and explicit comparison limits.
 - Memory-only session history for the latest 20 request outcomes and up to 100 operation favorites, with explicit clearing and reset on specification import or reload. History excludes submitted parameters, headers and bodies; opening an entry only navigates to its documentation.
 - Configurable French/English reference UI, known validation diagnostics, session controls and comparison screen. OpenAPI-authored content stays in its original language.
 - cURL/Fetch/Python selector with current-form examples, secret-header redaction and copy actions.
 - Integrator-defined server profiles that persist across operations, with credential clearing on origin changes and cancellation on destination changes.
 - Guided JSON body editor with field-path diagnostics, manual formatting that preserves literals and manual example insertion.
-- Reusable React reference with OpenAPI 3.1.x JSON/YAML/object/URL input, internal references, search and stable operation links.
+- Reusable React reference with OpenAPI 3.0.x/3.1.x JSON/YAML/object/URL input, internal references, search and stable operation links.
 - Manual HTTP console with parameters, JSON bodies, Bearer/API-key headers, origin-bound credentials, cancellation, timeout and redacted cURL.
 - Responsive editorial interface, light/dark modes and inline SVG icons.
 - Fictional, stateless Atelier API, showcase and Railway-hosted demo.
@@ -20,4 +22,4 @@ Repository update: 13 October 2026.
 - Chromium/mobile WebKit checks, React 18/19 packaged consumer example, GitHub CI and private vulnerability reporting.
 - Library declarations/CSS exports, contribution and compatibility documentation, and local archive installation.
 
-This version is available from the repository and local archive. It has not been published to npm, and the project license remains undecided.
+This MIT-licensed version is available from the repository and local archive. It has not been published to npm.

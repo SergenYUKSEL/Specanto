@@ -8,7 +8,7 @@ Specanto turns an OpenAPI document into a searchable React reference with a manu
 
 ## Current delivery
 
-Version `0.1.0` is a local package in development. `@specanto/react` is the working package name; the manifest is private and the package has not been published to npm. You can build and install a local tarball today.
+Version `0.1.0` is an MIT-licensed release candidate supporting the documented OpenAPI 3.0.x/3.1.x subset. `@specanto/react` is the working package name, pending verification of npm scope access. The manifest is prepared for public publication, but the package has not been published to npm: an npm account and access to the chosen scope are still needed. You can build and install a local tarball today.
 
 The repository also contains a showcase at `/`, an interactive demo at `/demo` and a local OpenAPI comparison screen at `/compare`. The demo uses the fictional Atelier shop API, with real HTTP requests:
 
@@ -169,6 +169,6 @@ SPECANTO_TEST_URL=http://localhost:3000 bun run test:e2e
 
 ## Licenses and release status
 
-A [proposed MIT license](./docs/LICENSE-MIT.proposed.txt) is prepared for the author's review. No project license has been adopted yet, and no package publication is authorized by this proposal.
+Specanto is licensed under [MIT](./LICENSE). Commercial use, modification and redistribution are permitted subject to the license's notice requirements. npm publication is authorized but pending account authentication and verification of the chosen package name/scope; the registry package is not available yet.
 
 [Third-party notices](./THIRD_PARTY_NOTICES.md) preserve dependency and demo font licenses. [Changelog](./CHANGELOG.md) records the unreleased candidate.

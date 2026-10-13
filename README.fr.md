@@ -8,7 +8,7 @@ Specanto transforme une description OpenAPI en documentation React interactive :
 
 ## État du projet
 
-La version `0.1.0` est un package local en développement. `@specanto/react` est son nom provisoire. Le manifeste est privé et le package n’est pas publié sur npm ; son installation se fait actuellement depuis une archive construite localement.
+La version `0.1.0` est une version candidate sous licence MIT, compatible avec le sous-ensemble documenté d’OpenAPI 3.0.x et 3.1.x. `@specanto/react` reste le nom prévu, dont l’accès au scope npm doit être confirmé. Le manifeste est prêt pour une publication publique, mais le package n’est pas encore publié : il manque un compte npm et l’accès au scope choisi. Son installation se fait actuellement depuis une archive locale.
 
 La vitrine est disponible sur `/`, la démo sur `/demo` et la comparaison locale OpenAPI sur `/compare`. La démo utilise Atelier, une boutique fictive d’objets design :
 
@@ -131,6 +131,6 @@ Le service est `specanto-demo` (`ac4e2b9e-b881-45bc-b75f-34d4952b9bc1`). Le [REA
 
 ## Licence
 
-Le [texte MIT proposé](./docs/LICENSE-MIT.proposed.txt) est préparé pour validation par l’auteur. Aucune licence du projet n’a encore été adoptée et le package reste non publié.
+Specanto est distribué sous [licence MIT](./LICENSE), qui autorise notamment l’usage commercial, la modification et la redistribution avec conservation des mentions prévues par la licence. La publication npm est autorisée, mais attend la création/connexion du compte et la vérification du nom/scope choisi. Le package n’est pas encore disponible sur le registre.
 
 Les [notices tierces](./THIRD_PARTY_NOTICES.md) conservent les licences des dépendances et des polices de démo. Le [changelog](./CHANGELOG.md) décrit la version candidate.

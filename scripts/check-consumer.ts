@@ -10,6 +10,7 @@ const matrix = [
   { react: '19.3.0', reactTypes: '19.3.0', reactDomTypes: '19.3.0' },
 ];
 const selectedVersion = process.env.SPECANTO_CONSUMER_REACT;
+const requestedArchive = process.env.SPECANTO_CONSUMER_TARBALL;
 const selected = selectedVersion ? matrix.filter((item) => item.react === selectedVersion) : matrix;
 
 async function command(args: string[], cwd: string) {
@@ -19,12 +20,19 @@ async function command(args: string[], cwd: string) {
 
 try {
   if (!selected.length) throw new Error(`Unsupported SPECANTO_CONSUMER_REACT value: ${selectedVersion}. Choose ${matrix.map((item) => item.react).join(' or ')}.`);
-  // Build first: the archive must contain current declarations and browser code.
-  await command(['bun', 'run', 'build:lib'], repository);
-  const pack = Bun.spawnSync(['bun', 'pm', 'pack', '--destination', temporary], { cwd: repository, stdout: 'pipe', stderr: 'pipe' });
-  if (pack.exitCode !== 0) throw new Error(pack.stderr.toString());
-  const tarball = (await Array.fromAsync(new Bun.Glob('*.tgz').scan(temporary)))[0];
-  if (!tarball) throw new Error('Package archive was not created');
+  let archivePath: string;
+  if (requestedArchive) {
+    archivePath = resolve(repository, requestedArchive);
+    if (!await Bun.file(archivePath).exists()) throw new Error(`Consumer archive does not exist: ${archivePath}`);
+  } else {
+    // Build first: the archive must contain current declarations and browser code.
+    await command(['bun', 'run', 'build:lib'], repository);
+    const pack = Bun.spawnSync(['bun', 'pm', 'pack', '--destination', temporary], { cwd: repository, stdout: 'pipe', stderr: 'pipe' });
+    if (pack.exitCode !== 0) throw new Error(pack.stderr.toString());
+    const tarball = (await Array.fromAsync(new Bun.Glob('*.tgz').scan(temporary)))[0];
+    if (!tarball) throw new Error('Package archive was not created');
+    archivePath = join(temporary, tarball);
+  }
   const manifest = JSON.parse(await readFile(join(example, 'package.json'), 'utf8'));
 
   for (const entry of selected) {
@@ -32,7 +40,7 @@ try {
     await cp(example, consumer, { recursive: true, filter: (path) => !path.split('/').some((part) => ['node_modules', 'dist', 'bun.lock'].includes(part)) });
     await writeFile(join(consumer, 'package.json'), JSON.stringify({
       ...manifest,
-      dependencies: { ...manifest.dependencies, '@specanto/react': `file:${join(temporary, tarball)}`, react: entry.react, 'react-dom': entry.react },
+      dependencies: { ...manifest.dependencies, '@specanto/react': `file:${archivePath}`, react: entry.react, 'react-dom': entry.react },
       devDependencies: { ...manifest.devDependencies, '@types/react': entry.reactTypes, '@types/react-dom': entry.reactDomTypes },
     }, null, 2));
     await writeFile(join(consumer, 'src', 'public-contracts.tsx'), `
@@ -79,6 +87,8 @@ import { ApiReference, parseSpec } from '@specanto/react';
 import { spec } from './src/spec';
 const normalized = parseSpec(spec);
 if (normalized.operations[0]?.id !== 'listProducts') throw new Error('Exported parser did not load the consumer specification');
+const legacy = parseSpec({ ...spec, openapi: '3.0.3' });
+if (legacy.openapiVersion !== '3.0.3' || legacy.operations[0]?.id !== 'listProducts') throw new Error('Packaged parser did not support OpenAPI 3.0');
 const html = renderToString(createElement(ApiReference, { spec, logo: 'Consumer reference', requestTimeoutMs: 5000 }));
 if (!html.includes('Consumer reference') || !html.includes('sp-reference')) throw new Error('React peer could not render the packaged component');
 `);

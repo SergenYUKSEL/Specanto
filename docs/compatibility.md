@@ -6,7 +6,11 @@ This is a bounded first implementation of an OpenAPI reference and browser HTTP 
 
 | Feature | Current behavior |
 | --- | --- |
-| OpenAPI versions | `3.1.x`, where the patch is numeric. Other versions, including Swagger 2 and OpenAPI 3.0, are rejected. |
+| OpenAPI versions | `3.0.x` and `3.1.x`, where the patch is numeric. Swagger 2, OpenAPI 3.2 and malformed versions are rejected. `NormalizedSpec.openapiVersion` records the source version separately from `info.version`. |
+| OpenAPI 3.0 schemas | The supported schema subset is normalized for the common engine. `nullable: true` adds `null` only when the same schema explicitly declares a type; enum restrictions still apply. Resolved source schemas remain available for inspection. |
+| OpenAPI 3.0 references | Resolved `$ref` siblings are ignored with a warning. 3.1 retains the existing sibling behavior. Unresolved/external/cyclic references retain the existing execution restrictions; no remote reference is fetched. |
+| OpenAPI 3.0 exclusive bounds | Boolean exclusive flags are normalized to numeric constraints when their inclusive bound exists. These exclusive constraints remain outside the partial client validator and are warned about. False/orphan flags have no effect. |
+| Dialect shape checks | 3.0 rejects type arrays, `type: null`, boolean schemas outside `additionalProperties`, and malformed nullable/exclusive flags in the consumed schema subset. This is not full document validation. |
 | Inputs | JSON text, YAML text, an object, or a URL fetched with `loadSpec`/`specUrl`. Required top-level metadata and `paths` are checked. The supplied object is copied. |
 | Input limits | 2 MiB per document, object depth 32; YAML alias expansion is bounded. Invalid or cyclic JavaScript input is rejected. |
 | Internal `$ref` | Internal JSON pointers, including escaped pointer segments, are resolved with a depth and node budget. |
@@ -53,9 +57,10 @@ The Atelier demo server has its own validation: email shape, supported product I
 | --- | --- |
 | Public APIs | `SpecComparison` and `compareSpecs`, with exported component/report/change/code/severity types. |
 | Component options | `locale?: 'fr' \| 'en'`, default `fr`; `colorMode?: 'light' \| 'dark'`, default `light`. No `system` mode or programmatic document prop. |
-| Component inputs | Two local OpenAPI 3.1 JSON/YAML files. Each retains the parser's 2 MiB/depth-32 bounds. Explicit comparison action, memory only, no upload or API execution. |
+| Component inputs | Two local OpenAPI 3.0/3.1 JSON/YAML files, including mixed-version pairs. Each retains the parser's 2 MiB/depth-32 bounds. Explicit comparison action, memory only, no upload or API execution. |
 | Core signature | `compareSpecs(before: NormalizedSpec, after: NormalizedSpec): SpecDiffReport`. Obtain inputs with `parseSpec` or an explicit `loadSpec` call. Comparison itself performs no fetch and does not mutate its inputs. |
 | Operation matching | HTTP method and path, independent of operation ID. Additions and removals are reported. |
+| Schema matching | Compares normalized schemas when available; raw boolean source is the fallback. Equivalent 3.0 nullable/exclusive constraints and their 3.1 representation do not create dialect-only changes. |
 | Compared subset | Parameters and serialization/requirement flags, request-body requirements, response statuses, normalized primary request/response media types, schema types/properties/required fields/enums/bounds, authentication alternatives and schemes. |
 | Primary media only | Normalization selects the first JSON or `+json` media type, otherwise the first available type. Changes confined to secondary media types may not appear. |
 | Exclusions | Servers and documentation metadata, including descriptions, examples and defaults. No full OpenAPI or JSON Schema equivalence assessment. |
@@ -89,4 +94,4 @@ The public [comparison screen](https://specanto-demo-production.up.railway.app/c
 
 ## Packaging
 
-The package exports an ES module, declarations and `@specanto/react/styles.css`. React and React DOM are peer dependencies (`>=18.2.0 <20`). The package is private and not published to npm; local installation uses a tarball built with Bun. The library runs in the consuming application without a separate Specanto deployment. The showcase and Atelier demo require their Bun server.
+The package exports an ES module, declarations and `@specanto/react/styles.css`. React and React DOM are peer dependencies (`>=18.2.0 <20`). The root [MIT LICENSE](../LICENSE), SPDX metadata and public npm publish configuration are included. The package is not published to npm yet: publisher authentication and scope access remain pending. Local installation uses a tarball built with Bun. The library runs in the consuming application without a separate Specanto deployment. The showcase and Atelier demo require their Bun server.

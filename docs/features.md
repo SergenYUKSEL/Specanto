@@ -17,11 +17,11 @@ La comparaison lit chaque fichier localement, avec une limite de 2 Mio par docum
 
 L’historique et les favoris sont remis à zéro lors d’un import ou d’un rechargement. Ouvrir une entrée revient à la documentation de l’opération ; aucune requête n’est rejouée. Les snippets comprennent les corps et paramètres actuels, même lorsque les en-têtes secrets sont masqués.
 
-Les 224 tests unitaires et d’intégration, les 112 contrôles Chromium/WebKit mobile contre le build de production et les consommateurs empaquetés React 18.2/19.3 passent. Le package reste privé et non publié sur npm ; la licence du projet reste à choisir.
+La version candidate utilise désormais la licence MIT et prend en charge le sous-ensemble documenté d’OpenAPI 3.0.x et 3.1.x. La publication npm attend le compte du mainteneur et la vérification de l’accès au scope choisi. Les résultats de vérification sont consignés dans le [compte rendu de livraison](./delivery.md).
 
 ## Extensions selon les demandes d'intégration
 
-OpenAPI 3.0, OAuth/OIDC, multipart, références externes et streaming méritent des lots séparés. Ils changent davantage les garanties du moteur et demandent des cas d'usage réels avant de fixer leur priorité. Un portail multi-API peut arriver plus tard, lorsque plusieurs équipes utilisent effectivement le composant.
+OpenAPI 3.0 est livré. OAuth/OIDC, multipart, références externes et streaming méritent encore des lots séparés. Ils changent davantage les garanties du moteur et demandent des cas d'usage réels avant de fixer leur priorité. Un portail multi-API peut arriver plus tard, lorsque plusieurs équipes utilisent effectivement le composant.
 
 ## Aperçus
 

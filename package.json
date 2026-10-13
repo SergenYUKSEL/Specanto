@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "description": "An expressive, reusable OpenAPI reference for React.",
   "type": "module",
-  "private": true,
   "packageManager": "bun@1.3.14",
   "files": [
     "dist",
+    "LICENSE",
     "README.md",
     "README.fr.md",
     "ROADMAP.md",
@@ -14,7 +14,6 @@
     "SECURITY.md",
     "docs/compatibility.md",
     "docs/delivery.md",
-    "docs/LICENSE-MIT.proposed.txt",
     "CHANGELOG.md",
     "THIRD_PARTY_NOTICES.md",
     "docs/customization.md",
@@ -86,5 +85,10 @@
     "react",
     "api-documentation",
     "api-reference"
-  ]
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
 }

@@ -2,17 +2,17 @@
 
 Status checked against the current code and verification results on 13 October 2026. The functional MVP, integration options and all six proposed feature additions are implemented in the repository. Remaining distribution decisions are listed separately from shipped features.
 
-Verification: 224 unit/integration tests, 112 Chromium/mobile WebKit checks against the production build, and the React 18.2/19.3 packaged consumer checks passed.
+Verification: 245 unit/integration tests, 118 Chromium/mobile WebKit checks against the production build, and installation/build/runtime checks of the exact MIT candidate archive in React 18.2/19.3 consumers passed.
 
 ## Delivered first slice
 
 - [x] React library, exported CSS and TypeScript declarations, installable as a local archive.
-- [x] JSON/YAML/object/URL input, bounded OpenAPI 3.1.x normalization and internal references.
+- [x] JSON/YAML/object/URL input, bounded OpenAPI 3.0.x/3.1.x normalization and internal references.
 - [x] Search, operation links, documentation, request preparation and real HTTP responses.
 - [x] Bearer and API-key header construction, memory-only credentials, origin binding and redacted cURL.
 - [x] Responsive operation screen, light/dark themes and SVG icons.
 - [x] Fictional Atelier API, stateless demo server, public showcase and Railway CLI deployment.
-- [x] 224 unit/integration tests, 112 Chromium/mobile WebKit checks, and React 18.2/19.3 packaged consumers with strict TypeScript verification.
+- [x] 245 unit/integration tests, 118 Chromium/mobile WebKit checks, and React 18.2/19.3 consumers with strict TypeScript contracts verified from the exact candidate archive.
 
 ## Priority 1: finish the MVP integration options
 
@@ -35,8 +35,8 @@ Verification: 224 unit/integration tests, 112 Chromium/mobile WebKit checks agai
 
 ## Priority 4: prepare public package distribution
 
-- [ ] Choose the project license and add the adopted root LICENSE. MIT is only prepared as a proposal in `docs/LICENSE-MIT.proposed.txt`.
-- [ ] Verify the package name/scope and publication access, complete package metadata, then remove `private` only when publishing is explicitly authorized.
+- [x] Adopt the root MIT LICENSE, SPDX metadata and public publication configuration; the author authorized the release candidate.
+- [ ] Create/authenticate the publisher's npm account and verify access to the chosen package scope. `@specanto/react` is the intended name, pending ownership verification.
 - [x] Review dependency/font licenses and prepare any required attribution for distribution.
 - [x] Establish a real private security-reporting channel and update SECURITY.md.
 - [x] README desktop/mobile screenshots and the first unreleased changelog entry.
@@ -55,6 +55,6 @@ All six original feature proposals are implemented. Their current behavior and b
 
 ## Later, optional scope
 
-More complete JSON Schema validation, additional OpenAPI versions, external references, OAuth/OIDC, multipart, streaming and multi-API portals are outside the initial MVP. They can be prioritized from actual integration needs; they are not prerequisites for releasing the documented subset.
+OpenAPI 3.0.x support is delivered alongside 3.1.x. More complete JSON Schema validation, other OpenAPI versions, external references, OAuth/OIDC, multipart, streaming and multi-API portals remain optional later work. They can be prioritized from actual integration needs; they are not prerequisites for releasing the documented subset.
 
 See [compatibility](./docs/compatibility.md) for current limitations and [delivery evidence](./docs/delivery.md) for commands and observed results.

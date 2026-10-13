@@ -112,10 +112,28 @@ GitHub CI runs `38314545349` for commit `ea1c1ce` and `38315239497` for correcte
 
 Railway deployment `245f9010-2c67-4e43-b2ee-88500690ca70` reached **SUCCESS** on the same project, production environment and service. Thirty selected browser journeys passed against the public service on Chromium and WebKit iPhone: comparison/locale/session actions, all three import-race regressions, responsive layouts, navigation and real GET/POST. Additional checks on both browsers verified the English comparison screen, its actual dark stylesheet, lack of horizontal overflow and absence of runtime errors. Public `/`, `/demo`, `/compare`, `/compare/`, `/health`, `/openapi.json` and `/api/products` returned HTTP 200; the page references the verified corrected production bundle.
 
+## MIT and OpenAPI 3.0 release candidate — 13 October 2026
+
+The author approved the recommended MIT + npm + OpenAPI 3.0 lot. The root LICENSE is adopted, the proposal file is removed, SPDX metadata is set and public npm publish configuration selects the official registry. The package stays at the unreleased version `0.1.0` because no registry version has been published.
+
+The parser now accepts OpenAPI 3.0.x and 3.1.x JSON/YAML/object/URL inputs. 3.0 nullable schemas normalize to the common type representation without widening enum restrictions; reference siblings follow 3.0 rules. Resolved source schemas remain inspectable. Boolean exclusive-bound flags normalize for comparison but remain outside the partial client validator with a warning. `NormalizedSpec.openapiVersion` records the source version, shown in the reference. Mixed-version comparisons use normalized schemas.
+
+| Candidate check | Observed result |
+| --- | --- |
+| Frozen installation, lint, TypeScript, whitespace and notices | Passed; 88 dependency/font packages verified |
+| Unit/integration suite | 245 passed, including nullable, reference, source preservation and mixed-dialect comparison cases |
+| Library and demo builds | Passed |
+| `CI=true bun run test:e2e` | 118 passed on Chromium and WebKit iPhone, including 3.0 import, YAML URL loading and mixed-version comparison |
+| Exact candidate archive | 42 files, root MIT LICENSE, SPDX/public registry metadata, JS/CSS/declarations; no demo/server/fixture files |
+| `SPECANTO_CONSUMER_TARBALL="output/specanto-react-0.1.0.tgz" bun run check:consumer` | React 18.2/19.3 strict types, build, runtime exports, 3.0 parser and CSS passed |
+| `npm publish ./output/specanto-react-0.1.0.tgz --dry-run --access public --registry https://registry.npmjs.org/` | Candidate accepted; npm warned that authentication is needed; no publication performed |
+
+The CLI reports `ENEEDAUTH` for `npm whoami`, and the author confirmed that no npm account exists yet. The package lookup returns 404, which does not establish ownership or availability of the `@specanto` scope. The candidate is ready for account setup and scope verification; no account, organization, registry version, tag or GitHub release was created. The release guide includes the exact-archive publication and post-publication verification steps.
+
 ## Distribution and remaining scope
 
-The local archive is `output/specanto-react-0.1.0.tgz`. It contains JS, CSS, TypeScript declarations and integration/compatibility documentation. The package name is provisional and the manifest stays private.
+The local archive is `output/specanto-react-0.1.0.tgz`. It contains JS, CSS, TypeScript declarations, the adopted MIT LICENSE and integration/compatibility documentation. The package name is provisional; the manifest is now prepared for public npm publication.
 
-Publication to npm, adopting the proposed license and control of the npm scope remain separate decisions. The completed integration/verification work and proposed extra features are recorded in the roadmap. Advanced JSON Schema validation, external references, OAuth/OIDC, multipart, streaming and multi-API portals are outside this release. The [compatibility matrix](./compatibility.md) records the current behavior and protection limits.
+The author approved MIT, OpenAPI 3.0 support and npm publication. Registry publication still requires an npm account, authentication and access to the chosen scope. Advanced JSON Schema validation, external references, OAuth/OIDC, multipart, streaming and multi-API portals remain outside this release. The [compatibility matrix](./compatibility.md) records the current behavior and protection limits.
 
 The [roadmap](../ROADMAP.md) records shipped integration options, verification and CI, remaining publication decisions, and the six [delivered feature extensions](./features.md).

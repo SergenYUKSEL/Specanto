@@ -58,10 +58,10 @@ Update the [compatibility matrix](./docs/compatibility.md) when support changes.
 
 ## Package and deployment
 
-`@specanto/react` is private and has not been published to npm. Local integration uses `bun run build:lib` followed by `bun pm pack --filename specanto-react-0.1.0.tgz`; see the [README](./README.md#install-the-local-react-package).
+`@specanto/react` is prepared as a public MIT-licensed candidate but has not been published to npm. Publisher authentication and scope ownership remain pending. Local integration uses `bun run build:lib` followed by `bun pm pack --filename specanto-react-0.1.0.tgz`; see the [README](./README.md#install-the-local-react-package).
 
 The public showcase and demo deploy through the Railway CLI to the exact project, environment and selected demo service recorded in the [README](./README.md#deployment). Deployment changes should pass the checks and be followed by a deployment-status and HTTP health check.
 
-The MIT text under `docs` is a proposal awaiting the author's decision. Do not replace it with an adopted root license or publish the package as part of a routine contribution.
+The project uses the root MIT [LICENSE](./LICENSE). Routine contributions do not authorize registry publication or changes to npm ownership.
 
 Refresh third-party notices after a runtime/font dependency update with `bun run scripts/notices.ts`. Follow the [manual release procedure](./docs/releasing.md) for a publication candidate.
