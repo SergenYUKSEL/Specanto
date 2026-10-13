@@ -42,12 +42,22 @@ PORT=3001 bun run start
 
 La vitrine, la démo et l’API sont alors servies ensemble sur `http://localhost:3001`.
 
+## Ajuster les panneaux (à partir de 0.3.0)
+
+Sur ordinateur, tirez les séparateurs entre la navigation, la documentation et la console. La colonne centrale occupe l’espace restant ; les largeurs sont limitées pour garder le contenu lisible. Double-cliquez sur un séparateur pour retrouver la taille par défaut. Au clavier : flèches gauche/droite, Maj pour un pas plus grand, Début/Fin pour les limites, Entrée pour réinitialiser et Échap pour annuler un glissement.
+
+Les tailles restent en mémoire pendant l’utilisation du composant, même après un changement de route ou de thème. Elles sont réinitialisées au rechargement et ne sont pas enregistrées dans le navigateur. Sur mobile, la présentation reste empilée, sans séparateur à tirer. Les libellés longs du menu reviennent à la ligne.
+
+La version 0.3.0 est en préparation de publication.
+
+![Panneaux redimensionnables](./docs/screenshots/resizable-panels.png)
+
 ## Créer une documentation locale (CLI à partir de 0.2.0)
 
 Pour un backend Express sur `http://localhost:3001` :
 
 ```sh
-bunx --package @specanto/react@0.2.1 specanto init api-docs --api-url http://localhost:3001
+bunx --package @specanto/react@0.3.0 specanto init api-docs --api-url http://localhost:3001
 cd api-docs
 bun install
 bun run dev
@@ -55,7 +65,7 @@ bun run dev
 
 `api-docs` est un nom de dossier d’exemple, que vous pouvez choisir librement. La CLI reprend ce nom pour l’application privée créée ; la bibliothèque installée reste `@specanto/react`.
 
-Avec npm : `npx --package @specanto/react@0.2.1 specanto init api-docs --api-url http://localhost:3001`, puis `npm install` et `npm run dev`.
+Avec npm : `npx --package @specanto/react@0.3.0 specanto init api-docs --api-url http://localhost:3001`, puis `npm install` et `npm run dev`.
 
 Ouvrez `http://127.0.0.1:5193` et adaptez `public/openapi.json` à vos routes. Le starter fournit un exemple à compléter ; il ne lit pas votre code backend. Son proxy local permet les requêtes manuelles sans modifier le CORS du backend. Aucune dépendance `swagger-jsdoc` ni route `/openapi.json` côté backend n’est nécessaire. Le dossier cible doit être nouveau et son parent doit exister ; la CLI n’installe aucune dépendance automatiquement. La CLI 0.2.0 est publiée sur npm. Depuis ce dépôt, vous pouvez aussi utiliser `node cli/index.mjs init api-docs --api-url http://localhost:3001`.
 
@@ -78,13 +88,13 @@ Pour une installation depuis les sources de ce dépôt, construisez l’archive 
 ```sh
 bun install
 bun run build:lib
-bun pm pack --filename specanto-react-0.2.1.tgz
+bun pm pack --filename specanto-react-0.3.0.tgz
 ```
 
 Depuis votre application React, ajoutez-la avec son chemin réel :
 
 ```sh
-bun add /chemin/absolu/vers/Specanto/specanto-react-0.2.1.tgz
+bun add /chemin/absolu/vers/Specanto/specanto-react-0.3.0.tgz
 ```
 
 Votre application fournit React et React DOM (`>=18.2.0 <20`).

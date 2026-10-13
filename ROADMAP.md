@@ -2,7 +2,7 @@
 
 Status checked against the current code and verification results on 13 October 2026. The functional MVP, integration options and all six proposed feature additions are implemented in the repository. Public npm distribution is complete; advanced optional features are listed separately.
 
-Verification: 261 unit/integration tests, 118 Chromium/mobile WebKit checks against the production build, and installation/build/runtime checks of the exact MIT archive and published npm package in React 18.2/19.3 consumers passed.
+Verification: 261 unit/integration tests, 132 Chromium/mobile WebKit checks against the production build, and installation/build/runtime checks of the exact MIT archive and published npm package in React 18.2/19.3 consumers passed.
 
 ## Delivered first slice
 
@@ -12,7 +12,7 @@ Verification: 261 unit/integration tests, 118 Chromium/mobile WebKit checks agai
 - [x] Bearer and API-key header construction, memory-only credentials, origin binding and redacted cURL.
 - [x] Responsive operation screen, light/dark themes and SVG icons.
 - [x] Fictional Atelier API, stateless demo server, public showcase and Railway CLI deployment.
-- [x] 261 unit/integration tests, 118 Chromium/mobile WebKit checks, and React 18.2/19.3 consumers with strict TypeScript contracts verified from the exact candidate archive.
+- [x] 261 unit/integration tests, 132 Chromium/mobile WebKit checks, and React 18.2/19.3 consumers with strict TypeScript contracts verified from the exact candidate archive.
 
 ## Priority 1: finish the MVP integration options
 
@@ -60,6 +60,14 @@ All six original feature proposals are implemented. Their current behavior and b
 - [x] Refuse existing destinations and malformed API targets; verify the generated app against real Express on Chromium and mobile WebKit.
 - [x] Document Express integration without swagger-jsdoc, Bearer authentication, existing documents and production access controls.
 - [x] Publish 0.2.0 and verify the same initialization command from npm, including the generated app and real Express proxy requests on Chromium and mobile WebKit.
+
+## Resizable reference panels — 0.3.0 candidate
+
+- [x] Wrap long navigation labels/tags and breadcrumbs without horizontal navigation scrolling.
+- [x] Resize navigation and console with pointers or keyboard, bounded to preserve the document, with reset and drag cancellation.
+- [x] Keep widths in component memory, preserve form/pending requests and use the stacked/mobile layout in narrow spaces.
+- [x] Verify all 132 production-build browser journeys on Chromium and WebKit.
+- [ ] Publish 0.3.0 and update the Railway demo.
 
 ## Later, optional scope
 

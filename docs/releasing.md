@@ -23,10 +23,10 @@ For the approved candidate, `private` is removed and `publishConfig` explicitly 
 ```sh
 bun run check
 CI=true bun run test:e2e
-bun pm pack --filename output/specanto-react-0.2.1.tgz
-SPECANTO_CONSUMER_TARBALL="output/specanto-react-0.2.1.tgz" bun run check:consumer
-SPECANTO_STARTER_TARBALL="output/specanto-react-0.2.1.tgz" bun run check:starter
-npm publish ./output/specanto-react-0.2.1.tgz --dry-run --access public --registry https://registry.npmjs.org/
+bun pm pack --filename output/specanto-react-0.3.0.tgz
+SPECANTO_CONSUMER_TARBALL="output/specanto-react-0.3.0.tgz" bun run check:consumer
+SPECANTO_STARTER_TARBALL="output/specanto-react-0.3.0.tgz" bun run check:starter
+npm publish ./output/specanto-react-0.3.0.tgz --dry-run --access public --registry https://registry.npmjs.org/
 ```
 
 Once account/scope access and the candidate are verified, publish that archive with the same command without `--dry-run`. npm may accept the upload before it becomes downloadable; wait for registry availability without resubmitting the same version. Verify the registry's version, integrity and license metadata, then install from the registry in a clean consumer before announcing availability. A successful dry run is not publication or proof of scope ownership.

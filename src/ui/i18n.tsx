@@ -3,6 +3,7 @@ import { createContext, useContext, type ReactNode } from 'react';
 export type ReferenceLocale = 'fr' | 'en';
 
 const fr = {
+  navigationWidth: 'Largeur de la navigation', requestWidth: 'Largeur de la console', resizePanels: 'Glisser ou utiliser les flèches pour ajuster. Double-clic ou Entrée pour réinitialiser.',
   exampleUnavailable: 'Exemple indisponible.', unexpectedError: 'Une erreur inattendue est survenue.',
   anyValue: 'toute valeur acceptée', noValue: 'aucune valeur acceptée', reference: 'référence', composition: 'composition',
   addFavorite: (name: string) => `Ajouter ${name} aux favoris`, removeFavorite: (name: string) => `Retirer ${name} des favoris`,
@@ -50,6 +51,7 @@ const fr = {
 
 type ReferenceMessages = { [Key in keyof typeof fr]: typeof fr[Key] extends (...args: infer Args) => string ? (...args: Args) => string : string };
 const en: ReferenceMessages = {
+  navigationWidth: 'Navigation width', requestWidth: 'Console width', resizePanels: 'Drag or use arrow keys to resize. Double-click or Enter to reset.',
   exampleUnavailable: 'Example unavailable.', unexpectedError: 'An unexpected error occurred.', anyValue: 'any value accepted', noValue: 'no value accepted', reference: 'reference', composition: 'composition',
   addFavorite: (name: string) => `Add ${name} to favorites`, removeFavorite: (name: string) => `Remove ${name} from favorites`,
   copy: 'Copy', copied: 'Copied', copiedClipboard: 'Copied to clipboard', copyLabel: label => `Copy ${label}`, copyNotice: label => `${label}: copied to clipboard.`, copyUnavailable: 'Copying is unavailable. Select the text to copy it.',

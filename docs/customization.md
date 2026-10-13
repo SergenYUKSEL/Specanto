@@ -125,3 +125,9 @@ Operations are matched by method and path, independently of `operationId`. The c
 The returned report includes `changes`, `warnings`, `summary` and `truncated`. Each change has a method, path, pointer-like location, category code, fixed explanation and severity (`added`, `removed`, `potentially-breaking` or `changed`); required-field transitions can additionally include `beforeRequired`/`afterRequired`. Reports do not copy example values, enum values or credentials. Schema/operation paths and field names still come from the supplied documents.
 
 The report holds at most 500 changes and traversal is bounded by depth 16 and 20,000 work visits. Reaching a limit or traversal cycle sets `truncated` and adds a warning; summary counts refer only to returned changes. Classification is heuristic: even an empty, untruncated report cannot certify complete API compatibility. Review the original documents and the warnings before integrating a changed API.
+
+## Resizable panels
+
+From version 0.3.0, desktop references offer draggable vertical separators. Navigation is limited to 220–420 px; the request console to 320–680 px, with further limits based on the available width to preserve 320 px for the documentation. The console stacks below the documentation in narrow reference containers; the mobile layout has no separators. Double-click or Enter resets a separator. Arrow keys adjust it (Shift uses a larger step), Home/End select its limits and Escape cancels an active drag.
+
+Choices belong to each mounted reference, survive operation/theme changes and clear when it is remounted or reloaded. No browser storage or new integrator props are required. Resizing does not execute or cancel requests and does not reset the form.

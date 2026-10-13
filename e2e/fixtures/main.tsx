@@ -19,6 +19,7 @@ const spec = {
     [operationPath]: {
       get: {
         operationId: 'fixtureOperation', summary: 'Opération de test',
+        ...(scenario === 'navigation' ? { summary: 'Documenter une opération avec un identifiant ' + 'LongUnbrokenIdentifier'.repeat(18), tags: ['LongUnbrokenTag'.repeat(18)] } : {}),
         description: scenario === 'unsafe' ? '<script>window.attacked=true</script>\n\n<img src=x onerror="window.attacked=true">\n\n[dangerous](javascript:window.attacked=true)\n\n![Tracking image](https://tracker.example.test/pixel)\n\nSafe documentation.' : 'Une opération réservée aux tests de la bibliothèque.',
         responses: { '200': { description: 'OK' }, '204': { description: 'Empty' }, '400': { description: 'Bad request' }, '401': { description: 'Unauthorized' }, '500': { description: 'Server error' } },
       },

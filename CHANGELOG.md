@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 — unreleased
+
+- Resizable navigation and request-console panels with pointer and keyboard controls, double-click/Enter reset and Escape drag cancellation. Width choices stay in component memory; the document occupies the remaining space.
+- Wrap long navigation labels/tags and breadcrumbs instead of allowing horizontal navigation scrolling.
+- Respect the available reference container when the console needs to stack below the documentation.
+
 ## 0.2.1 — 13 October 2026
 
 Published publicly on npm; the package name remains `@specanto/react`.
