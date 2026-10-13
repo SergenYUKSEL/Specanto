@@ -1,6 +1,8 @@
 # Changelog
 
-## 0.2.1 — unreleased
+## 0.2.1 — 13 October 2026
+
+Published publicly on npm; the package name remains `@specanto/react`.
 
 - Use the generic `api-docs` directory in all public starter examples. The library package remains `@specanto/react`; the CLI names the generated private app after the directory you choose.
 

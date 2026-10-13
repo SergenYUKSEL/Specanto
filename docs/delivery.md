@@ -152,9 +152,15 @@ Verification: lint, strict TypeScript, notices and both builds passed; 261 unit/
 
 GitHub CI run `38373688440` for source commit `de60ac0` was blocked before any step started. Its annotation reports an account payment failure or spending limit requiring review in Billing & plans. Local verification passed; no successful GitHub run or billing change is claimed.
 
+## Generic starter examples — 0.2.1
+
+Public README and Express-guide commands now use the generic `api-docs` directory. The library remains `@specanto/react`; the CLI names each generated private application after the integrator’s chosen directory. Source commit `92f56ae` prepares the correction without changing the library JS/CSS or CLI implementation.
+
+The 16 CLI tests passed, and the packaged starter built and exercised its real Express proxy on Chromium and WebKit. Version 0.2.1 was published after interactive npm authentication. Registry version, MIT license, latest tag and downloaded archive bytes were verified; the registry CLI creates a private `api-docs` app depending on 0.2.1. The npm website was refreshed and visibly showed version 0.2.1 and the generic initialization command, without the earlier project-specific example name. The published archive is preserved; no demo redeployment was required.
+
 ## Distribution and remaining scope
 
-The current local archive is `output/specanto-react-0.2.0.tgz`. It contains JS, CSS, TypeScript declarations, the optional CLI, the adopted MIT LICENSE and integration/compatibility documentation. The package is published publicly as `@specanto/react@0.2.0` on npm; the original 0.1.0 artifact is also preserved.
+The current local archive is `output/specanto-react-0.2.1.tgz`. It contains JS, CSS, TypeScript declarations, the optional CLI, the adopted MIT LICENSE and integration/compatibility documentation. The package is published publicly as `@specanto/react@0.2.1` on npm; earlier published artifacts are also preserved.
 
 The author approved MIT, OpenAPI 3.0 support and npm publication. Registry publication is complete; applications can install with `bun add @specanto/react` independently of the demo deployment. Advanced JSON Schema validation, external references, OAuth/OIDC, multipart, streaming and multi-API portals remain outside this release. The [compatibility matrix](./compatibility.md) records the current behavior and protection limits.
 

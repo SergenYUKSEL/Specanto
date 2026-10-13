@@ -2,7 +2,7 @@
 
 The checks workflow validates changes. It does not publish a package or deploy infrastructure. npm publication requires an explicit author decision and a usable npm account/scope.
 
-The author approved MIT, OpenAPI 3.0 support and npm publication on 13 October 2026. Version `@specanto/react@0.2.0` is published publicly under MIT, including the local documentation starter. The publisher authenticated as `sergenyuksel`, verified ownership of the `specanto` organization and completed npm’s interactive 2FA flow. Future versions still require candidate review and authenticated publication.
+The author approved MIT, OpenAPI 3.0 support and npm publication on 13 October 2026. Version `@specanto/react@0.2.1` is published publicly under MIT, including the local documentation starter. The publisher authenticated as `sergenyuksel`, verified ownership of the `specanto` organization and completed npm’s interactive 2FA flow. Future versions still require candidate review and authenticated publication.
 
 ## Prepare a candidate
 
@@ -23,10 +23,10 @@ For the approved candidate, `private` is removed and `publishConfig` explicitly 
 ```sh
 bun run check
 CI=true bun run test:e2e
-bun pm pack --filename output/specanto-react-0.2.0.tgz
-SPECANTO_CONSUMER_TARBALL="output/specanto-react-0.2.0.tgz" bun run check:consumer
-SPECANTO_STARTER_TARBALL="output/specanto-react-0.2.0.tgz" bun run check:starter
-npm publish ./output/specanto-react-0.2.0.tgz --dry-run --access public --registry https://registry.npmjs.org/
+bun pm pack --filename output/specanto-react-0.2.1.tgz
+SPECANTO_CONSUMER_TARBALL="output/specanto-react-0.2.1.tgz" bun run check:consumer
+SPECANTO_STARTER_TARBALL="output/specanto-react-0.2.1.tgz" bun run check:starter
+npm publish ./output/specanto-react-0.2.1.tgz --dry-run --access public --registry https://registry.npmjs.org/
 ```
 
 Once account/scope access and the candidate are verified, publish that archive with the same command without `--dry-run`. npm may accept the upload before it becomes downloadable; wait for registry availability without resubmitting the same version. Verify the registry's version, integrity and license metadata, then install from the registry in a clean consumer before announcing availability. A successful dry run is not publication or proof of scope ownership.
@@ -40,6 +40,10 @@ The first publication used the previously reviewed 42-file archive from source c
 ## Published 0.2.0 archive
 
 The starter release uses the reviewed 45-file archive from source commit `de60ac0`, SHA-256 `f40d0dcd84f748d6e17ea7fb5b650fd68e4cc7578d681c6b677437c5fa9d3e54`. Registry version, MIT license, `latest` tag, executable metadata and downloaded bytes were verified. The CLI and generated app were tested again from the registry, including Node/Bun entry points, documented bunx/npx commands, real Express proxy requests on Chromium/WebKit and React 18.2/19.3 consumers. The archive remains unchanged; repository documentation reflects completed publication. No Git tag or GitHub release was created.
+
+## Published 0.2.1 archive
+
+The documentation correction uses the reviewed archive from source commit `92f56ae`, SHA-256 `60c73223c9af8e1b7829556c53e49882d28e97320c63eeab39efd52e738190c6`. Public examples now use the generic `api-docs` directory; the package remains `@specanto/react`. Registry version, MIT license, latest tag and downloaded bytes were verified. The registry CLI creates a private app named `api-docs`, and the npm website visibly displays version 0.2.1 with the corrected README. Library JS/CSS and CLI implementation are unchanged. The published archive is preserved.
 
 ## Update the demo
 
