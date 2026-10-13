@@ -54,15 +54,17 @@ This serves the showcase, demo, OpenAPI fixture and controlled API together at `
 For an Express backend at `http://localhost:3001`, create a separate React app:
 
 ```sh
-bunx --package @specanto/react@0.2.0 specanto init mooddish-api-docs --api-url http://localhost:3001
-cd mooddish-api-docs
+bunx --package @specanto/react@0.2.1 specanto init api-docs --api-url http://localhost:3001
+cd api-docs
 bun install
 bun run dev
 ```
 
-With npm, use `npx --package @specanto/react@0.2.0 specanto init mooddish-api-docs --api-url http://localhost:3001`, then `npm install` and `npm run dev`.
+`api-docs` is an example directory name, which you can choose freely. The CLI uses that directory name for the generated private application; the installed library remains `@specanto/react`.
 
-Open `http://127.0.0.1:5193` and adapt `public/openapi.json` to your actual routes. The starter supplies an editable example, rather than detecting routes in your source. A local proxy sends manual requests to your backend without changing backend CORS. Neither `swagger-jsdoc` nor a backend `/openapi.json` route is required. The target directory must be new; dependencies are installed only when you run the install command. The parent directory must exist. CLI 0.2.0 is published on npm. From this checkout, you can also use `node cli/index.mjs init mooddish-api-docs --api-url http://localhost:3001`.
+With npm, use `npx --package @specanto/react@0.2.1 specanto init api-docs --api-url http://localhost:3001`, then `npm install` and `npm run dev`.
+
+Open `http://127.0.0.1:5193` and adapt `public/openapi.json` to your actual routes. The starter supplies an editable example, rather than detecting routes in your source. A local proxy sends manual requests to your backend without changing backend CORS. Neither `swagger-jsdoc` nor a backend `/openapi.json` route is required. The target directory must be new; dependencies are installed only when you run the install command. The parent directory must exist. CLI 0.2.0 is published on npm. From this checkout, you can also use `node cli/index.mjs init api-docs --api-url http://localhost:3001`.
 
 The proxy is for local development. See the [Express guide](./docs/express.md) for route schemas, Bearer authentication, existing OpenAPI documents and production access controls.
 
@@ -85,13 +87,13 @@ Build and pack from this repository:
 ```sh
 bun install
 bun run build:lib
-bun pm pack --filename specanto-react-0.2.0.tgz
+bun pm pack --filename specanto-react-0.2.1.tgz
 ```
 
 Then, from your React application, install the generated archive using its actual path:
 
 ```sh
-bun add /absolute/path/to/Specanto/specanto-react-0.2.0.tgz
+bun add /absolute/path/to/Specanto/specanto-react-0.2.1.tgz
 ```
 
 React and React DOM are peer dependencies (`>=18.2.0 <20`). Your application supplies them. The package contains an ES module, TypeScript declarations and an explicit CSS export.
