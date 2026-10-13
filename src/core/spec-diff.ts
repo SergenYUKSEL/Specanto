@@ -70,7 +70,7 @@ function key(operation: Operation): string { return `${operation.path}\u0000${op
 function subset<T>(left: T[], right: T[]): boolean { return left.every(item => right.includes(item)); }
 
 /**
- * Compare the normalized OpenAPI 3.1 subset without network access or source mutation.
+ * Compare the normalized OpenAPI 3.0/3.1 subset without network access or source mutation.
  * This is a review aid, not a complete JSON Schema or API compatibility certification.
  * Servers and documentation metadata are deliberately excluded.
  */
@@ -218,7 +218,7 @@ export function compareSpecs(before: NormalizedSpec, after: NormalizedSpec): Spe
     if (fingerprint(extra(oldNode), true) !== fingerprint(extra(newNode), true)) add(operation, location, 'schema-constraint-changed', 'potentially-breaking');
   }
 
-  function schemaOf(value: { rawSchema?: unknown; schema?: unknown }): unknown { return value.rawSchema !== undefined ? value.rawSchema : value.schema; }
+  function schemaOf(value: { rawSchema?: unknown; schema?: unknown }): unknown { return value.schema ?? value.rawSchema; }
   function serialization(parameter: Parameter): string {
     const style = parameter.style ?? (parameter.in === 'query' || parameter.in === 'cookie' ? 'form' : 'simple');
     return `${style}:${parameter.explode ?? style === 'form'}`;

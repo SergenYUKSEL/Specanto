@@ -50,6 +50,8 @@ export type Operation = {
   unsupported: string[];
 };
 export type NormalizedSpec = {
+  /** Source OpenAPI dialect/version, separate from info.version. */
+  openapiVersion?: string;
   title: string;
   version: string;
   description: string;

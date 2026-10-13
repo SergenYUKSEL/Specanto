@@ -12,7 +12,7 @@ type Filter = 'all' | SpecDiffSeverity;
 
 const COPY = {
   en: {
-    title: 'Compare two APIs', eyebrow: 'OpenAPI comparison', introduction: 'Load an earlier and a newer OpenAPI 3.1 document to review changes before integrating a new version.',
+    title: 'Compare two APIs', eyebrow: 'OpenAPI comparison', introduction: 'Load an earlier and a newer OpenAPI 3.0 or 3.1 document to review changes before integrating a new version.',
     before: 'Before', after: 'After', documentBefore: 'Before document', documentAfter: 'After document', select: 'Choose a JSON or YAML file · 2 MiB maximum', loading: 'Reading document…',
     compare: 'Compare', clear: 'Clear files', empty: 'Choose both documents, then run the comparison.', result: 'Comparison results', filter: 'Show changes', all: 'All changes',
     added: 'Added', removed: 'Removed', 'potentially-breaking': 'Potentially breaking', changed: 'Changed',
@@ -20,13 +20,13 @@ const COPY = {
     partial: 'This review covers operations, parameters, the primary request and response media types, supported schema constraints and authentication. It cannot certify full API compatibility. Servers, descriptions and examples are excluded.',
     memory: 'Files are read locally and kept in memory. No API request is sent.', noChanges: 'No changes detected in the compared subset.', noFilteredChanges: 'No changes in this category.',
     truncated: 'Report incomplete: the change, work or depth limit was reached. Counts describe the changes shown.', warnings: 'Review notes',
-    large: 'This file exceeds the 2 MiB limit.', invalid: 'This file is not a valid supported OpenAPI 3.1 JSON or YAML document.', unreadable: 'This file could not be read.',
+    large: 'This file exceeds the 2 MiB limit.', invalid: 'This file is not a valid supported OpenAPI 3.0 or 3.1 JSON or YAML document.', unreadable: 'This file could not be read.',
     normalized: 'The documents contain normalization warnings. Some OpenAPI features may not be represented.', unsupported: 'Some operations contain unsupported or partially supported features. Review the original documents.',
     boolean: 'Boolean schemas are compared conservatively and need manual review.', reference: 'Unresolved, external or cyclic references prevent a complete comparison.',
     advanced: 'Additional JSON Schema keywords are compared conservatively. Their full semantics are not evaluated.', limit: 'The comparison reached a depth, cycle or work limit. Some changes may be omitted.', changesLimit: 'The report shows at most 500 changes.',
   },
   fr: {
-    title: 'Comparer deux API', eyebrow: 'Comparaison OpenAPI', introduction: 'Chargez une ancienne et une nouvelle version OpenAPI 3.1 pour examiner les changements avant une intégration.',
+    title: 'Comparer deux API', eyebrow: 'Comparaison OpenAPI', introduction: 'Chargez une ancienne et une nouvelle version OpenAPI 3.0 ou 3.1 pour examiner les changements avant une intégration.',
     before: 'Avant', after: 'Après', documentBefore: 'Document avant', documentAfter: 'Document après', select: 'Choisissez un fichier JSON ou YAML · 2 Mio maximum', loading: 'Lecture du document…',
     compare: 'Comparer', clear: 'Effacer les fichiers', empty: 'Choisissez les deux documents, puis lancez la comparaison.', result: 'Résultat de la comparaison', filter: 'Afficher les changements', all: 'Tous les changements',
     added: 'Ajouts', removed: 'Suppressions', 'potentially-breaking': 'Ruptures potentielles', changed: 'Modifications',
@@ -34,7 +34,7 @@ const COPY = {
     partial: 'Cette revue compare les opérations, paramètres, types de contenu principaux, contraintes de schéma prises en charge et authentification. Elle ne certifie pas la compatibilité complète des API. Serveurs, descriptions et exemples sont exclus.',
     memory: 'Les fichiers sont lus localement et conservés en mémoire. Aucune requête API n’est envoyée.', noChanges: 'Aucun changement détecté dans le périmètre comparé.', noFilteredChanges: 'Aucun changement dans cette catégorie.',
     truncated: 'Rapport incomplet : une limite de changements, de parcours ou de profondeur a été atteinte. Les compteurs portent sur les changements affichés.', warnings: 'Points à vérifier',
-    large: 'Ce fichier dépasse la limite de 2 Mio.', invalid: 'Ce fichier n’est pas un document OpenAPI 3.1 JSON ou YAML valide pris en charge.', unreadable: 'Impossible de lire ce fichier.',
+    large: 'Ce fichier dépasse la limite de 2 Mio.', invalid: 'Ce fichier n’est pas un document OpenAPI 3.0 ou 3.1 JSON ou YAML valide pris en charge.', unreadable: 'Impossible de lire ce fichier.',
     normalized: 'Les documents comportent des avertissements de normalisation. Certaines fonctions OpenAPI peuvent être absentes du rapport.', unsupported: 'Certaines opérations utilisent des fonctions partiellement prises en charge. Vérifiez les documents originaux.',
     boolean: 'Les schémas booléens sont comparés avec prudence et demandent une vérification manuelle.', reference: 'Des références non résolues, externes ou cycliques empêchent une comparaison complète.',
     advanced: 'Les mots-clés JSON Schema supplémentaires sont comparés avec prudence, sans évaluer toute leur sémantique.', limit: 'Le parcours a atteint une limite de profondeur, de cycle ou de volume. Certains changements peuvent être omis.', changesLimit: 'Le rapport affiche au maximum 500 changements.',

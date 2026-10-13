@@ -53,6 +53,7 @@ describe('reference interface language', () => {
 describe('localized diagnostics preserve engine data', () => {
   test.each([
     ['Only OpenAPI 3.1.x documents are supported.', 'Seuls les documents OpenAPI 3.1.x sont pris en charge.'],
+    ['Only OpenAPI 3.0.x and 3.1.x documents are supported.', 'Seuls les documents OpenAPI 3.0.x et 3.1.x sont pris en charge.'],
     ['Could not load the OpenAPI document: HTTP 401.', 'Impossible de charger le document OpenAPI : HTTP 401.'],
     ['Required parameter product_id is missing.', 'Le paramètre product_id est requis.'],
     ['$.items[0].quantity must be integer or null.', '$.items[0].quantity doit être de type entier ou nul.'],

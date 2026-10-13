@@ -19,7 +19,7 @@ test('imports YAML and searches the actual operations', async ({ page }) => {
 test('shows an actionable parsing error for an unsupported version', async ({ page }) => {
   await page.goto('/demo');
   await page.getByRole('button', { name: 'Importer une API', exact: true }).click();
-  await page.getByRole('dialog').locator('input[type=file]').setInputFiles({ name: 'old.json', mimeType: 'application/json', buffer: Buffer.from('{"openapi":"3.0.0","info":{"title":"Old","version":"1"},"paths":{}}') });
+  await page.getByRole('dialog').locator('input[type=file]').setInputFiles({ name: 'old.json', mimeType: 'application/json', buffer: Buffer.from('{"openapi":"3.2.0","info":{"title":"Old","version":"1"},"paths":{}}') });
   await expect(page.locator('.sp-reference')).toContainText(/3\.1/);
   await expect(page.locator('.sp-reference')).not.toContainText('Créer une commande');
 });

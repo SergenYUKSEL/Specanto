@@ -41,7 +41,7 @@ function readDocument(input: string | object): RecordValue {
   try { serialized = JSON.stringify(value); } catch { throw new Error('The document is not a serializable object.'); }
   if (!serialized || new TextEncoder().encode(serialized).byteLength > SPEC_BYTE_LIMIT) throw new Error('The document is too large or empty (2 MiB limit).');
   const document = record(JSON.parse(serialized));
-  if (!/^3\.1\.\d+$/.test(string(document.openapi))) throw new Error('Only OpenAPI 3.1.x documents are supported.');
+  if (!/^3\.[01]\.\d+$/.test(string(document.openapi))) throw new Error('Only OpenAPI 3.0.x and 3.1.x documents are supported.');
   const info = record(document.info);
   if (!string(info.title) || !string(info.version)) throw new Error('OpenAPI info.title and info.version are required.');
   if (!document.paths || Array.isArray(document.paths) || typeof document.paths !== 'object') throw new Error('OpenAPI paths must be an object.');
@@ -49,6 +49,7 @@ function readDocument(input: string | object): RecordValue {
 }
 
 function createResolver(document: RecordValue, warn: (message: string) => void) {
+  const ignoreRefSiblings = string(document.openapi).startsWith('3.0.');
   let visited = 0;
   function resolve(value: unknown, depth = 0, chain: string[] = []): unknown {
     if (value === null || typeof value !== 'object') return value;
@@ -84,6 +85,10 @@ function createResolver(document: RecordValue, warn: (message: string) => void) 
       }
       const siblings = Object.fromEntries(Object.entries(node).filter(([key]) => key !== '$ref'));
       const resolvedTarget = resolve(target, depth + 1, [...chain, ref]);
+      if (ignoreRefSiblings) {
+        if (Object.keys(siblings).length) warn(`OpenAPI 3.0 reference siblings were ignored: ${ref}`);
+        return resolvedTarget;
+      }
       if (typeof resolvedTarget === 'boolean') {
         warn(`Boolean schema reference is display-only: ${ref}`);
         return Object.keys(siblings).length ? { ...node } : resolvedTarget;
@@ -116,11 +121,11 @@ function normalizeServers(value: unknown, warn: (message: string) => void): Serv
   });
 }
 
-function normalizeParameter(value: unknown): Parameter | undefined {
+function normalizeParameter(value: unknown, dialect: '3.0' | '3.1'): Parameter | undefined {
   const node = record(value);
   const location = string(node.in);
   if (!string(node.name) || !['path', 'query', 'header', 'cookie'].includes(location)) return undefined;
-  const schema = normalizeSchema(node.schema, `parameter ${location}:${string(node.name)} schema`);
+  const schema = normalizeSchema(node.schema, `parameter ${location}:${string(node.name)} schema`, dialect);
   const type = Array.isArray(schema?.type) ? schema.type.find(item => item !== 'null') : schema?.type;
   const scalar = !type || ['string', 'number', 'integer', 'boolean'].includes(type);
   const style = string(node.style) || (location === 'query' || location === 'cookie' ? 'form' : 'simple');
@@ -148,24 +153,24 @@ function mediaExample(media: RecordValue): unknown {
   return record(first).value;
 }
 
-function normalizeBody(value: unknown): RequestBody | undefined {
+function normalizeBody(value: unknown, dialect: '3.0' | '3.1'): RequestBody | undefined {
   if (value === undefined) return undefined;
   const node = record(value);
   const media = firstMedia(node.content);
   const mediaType = media?.[0] ?? '';
   return {
     required: node.required === true, description: string(node.description), mediaType,
-    schema: normalizeSchema(media?.[1].schema, 'request body schema'), rawSchema: media?.[1].schema,
+    schema: normalizeSchema(media?.[1].schema, 'request body schema', dialect), rawSchema: media?.[1].schema,
     example: media ? mediaExample(media[1]) : undefined,
     supported: Boolean(media && (mediaType === 'application/json' || mediaType.endsWith('+json')) && !hasReference(node) && !hasBooleanSchema(media[1].schema)),
   };
 }
 
-function normalizeResponses(value: unknown): ApiResponse[] {
+function normalizeResponses(value: unknown, dialect: '3.0' | '3.1'): ApiResponse[] {
   return Object.entries(record(value)).map(([status, item]) => {
     const node = record(item);
     const media = firstMedia(node.content);
-    return { status, description: string(node.description), contentType: media?.[0], schema: normalizeSchema(media?.[1].schema, `response ${status} schema`), rawSchema: media?.[1].schema, example: media ? mediaExample(media[1]) : undefined };
+    return { status, description: string(node.description), contentType: media?.[0], schema: normalizeSchema(media?.[1].schema, `response ${status} schema`, dialect), rawSchema: media?.[1].schema, example: media ? mediaExample(media[1]) : undefined };
   });
 }
 
@@ -180,7 +185,7 @@ function validSecurity(value: unknown): boolean {
   );
 }
 
-const UNVALIDATED_KEYWORDS = new Set(['allOf', 'anyOf', 'oneOf', 'not', 'if', 'then', 'else', 'dependentSchemas', 'dependentRequired', 'pattern', 'patternProperties', 'additionalProperties', 'unevaluatedProperties', 'unevaluatedItems', 'contains', 'minContains', 'maxContains', 'uniqueItems', 'const', 'multipleOf', 'minLength', 'maxLength', 'exclusiveMinimum', 'exclusiveMaximum', 'prefixItems', 'propertyNames', 'format']);
+const UNVALIDATED_KEYWORDS = new Set(['nullable', 'allOf', 'anyOf', 'oneOf', 'not', 'if', 'then', 'else', 'dependentSchemas', 'dependentRequired', 'pattern', 'patternProperties', 'additionalProperties', 'unevaluatedProperties', 'unevaluatedItems', 'contains', 'minContains', 'maxContains', 'uniqueItems', 'const', 'multipleOf', 'minLength', 'maxLength', 'exclusiveMinimum', 'exclusiveMaximum', 'prefixItems', 'propertyNames', 'format']);
 
 function unvalidatedKeywords(schema: Schema | undefined): string[] {
   const keywords = new Set<string>();
@@ -197,6 +202,7 @@ function unvalidatedKeywords(schema: Schema | undefined): string[] {
 
 export function parseSpec(input: string | object, sourceUrl?: string): NormalizedSpec {
   const document = readDocument(input);
+  const dialect = string(document.openapi).startsWith('3.0.') ? '3.0' : '3.1';
   const warnings = new Set<string>();
   const warn = (message: string) => { warnings.add(message); };
   const resolve = createResolver(document, warn);
@@ -224,7 +230,7 @@ export function parseSpec(input: string | object, sourceUrl?: string): Normalize
       const unsupported: string[] = [];
       if (hasReference(op) && string(op.$ref) || string(pathItem.$ref)) unsupported.push('An unresolved operation or path reference prevents execution.');
       for (const rawParameter of rawParameters) {
-        const parameter = normalizeParameter(rawParameter);
+        const parameter = normalizeParameter(rawParameter, dialect);
         if (!parameter) { unsupported.push('An unresolved or invalid parameter prevents execution.'); continue; }
         parameters.set(`${parameter.in}:${parameter.name}`, parameter);
       }
@@ -232,10 +238,10 @@ export function parseSpec(input: string | object, sourceUrl?: string): Normalize
         if (!parameter.supported) unsupported.push(`Unsupported parameter serialization or reference: ${parameter.in}:${parameter.name}`);
         if (hasBooleanSchema(parameter.rawSchema)) warn(`Boolean request parameter schema is display-only: ${method.toUpperCase()} ${path} ${parameter.in}:${parameter.name}`);
       }
-      const requestBody = normalizeBody(op.requestBody);
+      const requestBody = normalizeBody(op.requestBody, dialect);
       if (requestBody && !requestBody.supported) unsupported.push(`Unsupported request body media type, schema or reference: ${requestBody.mediaType || 'unresolved'}`);
       if (hasBooleanSchema(requestBody?.rawSchema)) warn(`Boolean request body schema is display-only: ${method.toUpperCase()} ${path}`);
-      const responses = normalizeResponses(op.responses);
+      const responses = normalizeResponses(op.responses, dialect);
       for (const response of responses) {
         if (hasBooleanSchema(response.rawSchema)) warn(`Boolean response schema is display-only: ${method.toUpperCase()} ${path} ${response.status}`);
       }
@@ -257,6 +263,7 @@ export function parseSpec(input: string | object, sourceUrl?: string): Normalize
     }
   }
   return {
+    openapiVersion: string(document.openapi),
     title: string(info.title), version: string(info.version), description: string(info.description),
     servers: rootServers, tags: list(document.tags).map(item => ({ name: string(record(item).name), description: string(record(item).description) })),
     operations, warnings: [...warnings], sourceUrl,

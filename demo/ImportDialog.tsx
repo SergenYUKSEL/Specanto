@@ -4,11 +4,11 @@ import { Icon } from '../src/ui/Icon';
 export function ImportDialog({ onClose, onImport, locale = 'fr' }: { onClose: () => void; onImport: (input: { spec: string } | { specUrl: string }) => void; locale?: 'fr' | 'en' }) {
   const text = locale === 'en' ? {
     tooLarge: 'The document exceeds the 2 MiB limit.', unreadable: 'Unable to read this file. Choose a JSON or YAML file.', invalidUrl: 'Enter a complete HTTP or HTTPS URL without credentials.',
-    title: 'Your API, here.', close: 'Close import', intro: 'Load an OpenAPI 3.1 description in JSON or YAML.', file: 'Choose a JSON or YAML file', size: '2 MiB maximum · The file stays in your browser.',
+    title: 'Your API, here.', close: 'Close import', intro: 'Load an OpenAPI 3.0 or 3.1 description in JSON or YAML.', file: 'Choose a JSON or YAML file', size: '2 MiB maximum · The file stays in your browser.',
     divider: 'or from a URL', url: 'OpenAPI description URL', load: 'Load documentation', note: 'URL loading depends on server permissions. No request-console secret is sent.',
   } : {
     tooLarge: 'Le document dépasse la limite de 2 Mio.', unreadable: 'Impossible de lire ce fichier. Choisissez un fichier JSON ou YAML.', invalidUrl: 'Saisissez une URL HTTP ou HTTPS complète, sans identifiants.',
-    title: 'Votre API, ici.', close: 'Fermer l’import', intro: 'Chargez une description OpenAPI 3.1 au format JSON ou YAML.', file: 'Choisir un fichier JSON ou YAML', size: '2 Mio maximum · Le fichier reste dans votre navigateur.',
+    title: 'Votre API, ici.', close: 'Fermer l’import', intro: 'Chargez une description OpenAPI 3.0 ou 3.1 au format JSON ou YAML.', file: 'Choisir un fichier JSON ou YAML', size: '2 Mio maximum · Le fichier reste dans votre navigateur.',
     divider: 'ou depuis une URL', url: 'URL de la description OpenAPI', load: 'Charger la documentation', note: 'Le chargement par URL dépend des autorisations du serveur. Aucun secret du client de test n’est transmis.',
   };
   const dialog = useRef<HTMLDialogElement>(null);

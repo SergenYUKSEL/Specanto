@@ -69,7 +69,7 @@ function Showcase() {
           <p>Des routes faciles à trouver. Des requêtes à portée de main.<br className="desktop-break" /> Une documentation qui donne envie de comprendre votre API.</p>
           <a className="primary-link" href="/demo">Explorer la démo <Icon name="arrowUpRight" size={22} /></a>
         </div>
-        <div className="hero-meta"><span>Bibliothèque React</span><span>OpenAPI 3.1</span><span>Sans compte</span></div>
+        <div className="hero-meta"><span>Bibliothèque React</span><span>OpenAPI 3.0 / 3.1</span><span>Sans compte</span></div>
       </section>
       <section className="live-section" aria-labelledby="live-title">
         <div className="section-heading"><div><h2 id="live-title">De la spec à la requête.</h2><p>Une API de boutique fictive. Un vrai client HTTP. À vous de jouer.</p></div><a href="/demo">Passer en plein écran <Icon name="arrowUpRight" /></a></div>

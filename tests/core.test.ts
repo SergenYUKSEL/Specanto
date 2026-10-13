@@ -26,7 +26,7 @@ describe('OpenAPI normalization', () => {
 
   test('rejects malformed, incompatible, too large and too deep documents', () => {
     expect(() => parseSpec('{oops')).toThrow();
-    expect(() => parseSpec({ ...document(), openapi: '3.0.3' })).toThrow(/3\.1/);
+    expect(() => parseSpec({ ...document(), openapi: '3.2.0' })).toThrow(/3\.1/);
     expect(() => parseSpec({ ...document(), info: { title: 'a'.repeat(2 * 1024 * 1024), version: '1' } })).toThrow(/large|limit|MiB/i);
     let nested: unknown = 'leaf';
     for (let index = 0; index < 34; index++) nested = { child: nested };

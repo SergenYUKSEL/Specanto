@@ -28,14 +28,14 @@ test('an invalid import diagnostic survives the initial URL result and a locale 
   const release = await holdInitialDocument(page);
   try {
     await page.keyboard.press('Control+k');
-    await page.locator('.sp-reference input[type=file]').setInputFiles({ name: 'unsupported.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ openapi: '3.0.3', info: { title: 'Old', version: '1' }, paths: {} })) });
+    await page.locator('.sp-reference input[type=file]').setInputFiles({ name: 'unsupported.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ openapi: '3.2.0', info: { title: 'Old', version: '1' }, paths: {} })) });
     const error = page.locator('.sp-import-error');
-    await expect(error).toContainText('Seuls les documents OpenAPI 3.1.x');
+    await expect(error).toContainText('Seuls les documents OpenAPI 3.0.x et 3.1.x');
     await release();
     await expect(page.getByRole('heading', { name: 'Deferred URL operation', exact: true })).toBeVisible();
-    await expect(error).toContainText('Seuls les documents OpenAPI 3.1.x');
+    await expect(error).toContainText('Seuls les documents OpenAPI 3.0.x et 3.1.x');
     await page.getByLabel('Langue de l’interface', { exact: true }).selectOption('en');
-    await expect(error).toContainText('Only OpenAPI 3.1.x documents are supported');
+    await expect(error).toContainText('Only OpenAPI 3.0.x and 3.1.x documents are supported');
     await expect(error).not.toContainText('Seuls les documents');
   } finally { await release(); }
 });

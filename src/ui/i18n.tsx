@@ -77,6 +77,7 @@ export function localizeError(error: unknown, locale: ReferenceLocale = 'fr'): s
   const source = error instanceof Error ? error.message : typeof error === 'string' ? error : messages[locale].unexpectedError;
   if (locale === 'en') return source === 'requestTimeoutMs doit être un entier compris entre 100 et 300000 ms.' ? 'requestTimeoutMs must be an integer between 100 and 300000 ms.' : source;
   const exact: Record<string, string> = {
+    'Only OpenAPI 3.0.x and 3.1.x documents are supported.': 'Seuls les documents OpenAPI 3.0.x et 3.1.x sont pris en charge.',
     'Only OpenAPI 3.1.x documents are supported.': 'Seuls les documents OpenAPI 3.1.x sont pris en charge.',
     'OpenAPI info.title and info.version are required.': 'Les champs OpenAPI info.title et info.version sont requis.',
     'OpenAPI paths must be an object.': 'Le champ OpenAPI paths doit être un objet.',
@@ -122,6 +123,7 @@ export function localizeError(error: unknown, locale: ReferenceLocale = 'fr'): s
   };
   if (exact[source]) return exact[source];
   const rules: [RegExp, (...parts: string[]) => string][] = [
+    [/^OpenAPI 3\.0 reference siblings were ignored: (.+)$/, ref => `Les champs voisins de la référence OpenAPI 3.0 ont été ignorés : ${ref}`],
     [/^Remote or external reference is display-only: (.+)$/, ref => `La référence distante ou externe est disponible en lecture seule : ${ref}`],
     [/^Cyclic reference is display-only: (.+)$/, ref => `La référence circulaire est disponible en lecture seule : ${ref}`],
     [/^Missing internal reference: (.+)$/, ref => `Référence interne introuvable : ${ref}`],
@@ -157,7 +159,7 @@ export function localizeError(error: unknown, locale: ReferenceLocale = 'fr'): s
     [/^Duplicate server profile id: (.+)$/, id => `Identifiant de profil de serveur en double : ${id}`],
     [/^Server profile (.+) must be a non-empty string\.$/, field => `Le champ ${field} du profil de serveur doit être un texte non vide.`],
     [/^Server profile (.+) exceeds the (.+) character limit\.$/, (field, limit) => `Le champ ${field} du profil de serveur dépasse la limite de ${limit} caractères.`],
-    [/^Invalid (.+): (.+)$/, (path, detail) => `${path} invalide : ${({ 'a schema must be an object or boolean.': 'un schéma doit être un objet ou un booléen.', 'schema depth exceeds 32.': 'la profondeur du schéma dépasse 32.', 'use a recognized schema type or array of types.': 'utilisez un type de schéma reconnu ou un tableau de types.', 'expected a string.': 'un texte est attendu.', 'expected an array.': 'un tableau est attendu.', 'expected an array of strings.': 'un tableau de textes est attendu.', 'expected an object containing schemas.': 'un objet contenant des schémas est attendu.', 'expected an array of schemas.': 'un tableau de schémas est attendu.' } as Record<string, string>)[detail] ?? detail}`],
+    [/^Invalid (.+): (.+)$/, (path, detail) => `${path} invalide : ${({ 'a schema must be an object or boolean.': 'un schéma doit être un objet ou un booléen.', 'schema depth exceeds 32.': 'la profondeur du schéma dépasse 32.', 'OpenAPI 3.0 schemas must be objects.': 'les schémas OpenAPI 3.0 doivent être des objets.', 'OpenAPI 3.0 requires a single non-null type.': 'OpenAPI 3.0 exige un type unique autre que null.', 'OpenAPI 3.0 requires a boolean.': 'OpenAPI 3.0 exige un booléen.', 'OpenAPI 3.0 requires a finite number.': 'OpenAPI 3.0 exige un nombre fini.', 'use a recognized schema type or array of types.': 'utilisez un type de schéma reconnu ou un tableau de types.', 'expected a string.': 'un texte est attendu.', 'expected an array.': 'un tableau est attendu.', 'expected an array of strings.': 'un tableau de textes est attendu.', 'expected an object containing schemas.': 'un objet contenant des schémas est attendu.', 'expected an array of schemas.': 'un tableau de schémas est attendu.' } as Record<string, string>)[detail] ?? detail}`],
     [/^Unsupported request: (.+)$/s, detail => `Requête non prise en charge : ${localizeError(detail, locale)}`],
     [/^Unsupported parameter serialization or reference: (.+)$/, detail => `Sérialisation ou référence de paramètre non prise en charge : ${detail}`],
     [/^Unsupported request body media type, schema or reference: (.+)$/, detail => `Type de média, schéma ou référence du corps non pris en charge : ${detail}`],
