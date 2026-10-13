@@ -2,7 +2,7 @@
 
 The checks workflow validates changes. It does not publish a package or deploy infrastructure. npm publication requires an explicit author decision and a usable npm account/scope.
 
-The author approved MIT, OpenAPI 3.0 support and publication preparation on 13 October 2026. The candidate uses `license: "MIT"`, includes the root LICENSE and has public publish configuration. Publication is currently blocked by the absence of a publisher npm account and unverified access to `@specanto`; a registry 404 does not resolve either issue.
+The author approved MIT, OpenAPI 3.0 support and npm publication on 13 October 2026. Version `@specanto/react@0.1.0` is published publicly under MIT. The publisher authenticated as `sergenyuksel`, verified ownership of the `specanto` organization and completed npm’s interactive 2FA flow. Future versions still require candidate review and authenticated publication.
 
 ## Prepare a candidate
 
@@ -28,9 +28,13 @@ SPECANTO_CONSUMER_TARBALL="output/specanto-react-0.1.0.tgz" bun run check:consum
 npm publish ./output/specanto-react-0.1.0.tgz --dry-run --access public --registry https://registry.npmjs.org/
 ```
 
-Once account/scope access and the candidate are verified, publish that archive with the same command without `--dry-run`. Verify the registry's version, integrity and license metadata, then install from the registry in a clean consumer before announcing availability. A successful dry run is not publication or proof of scope ownership.
+Once account/scope access and the candidate are verified, publish that archive with the same command without `--dry-run`. npm may accept the upload before it becomes downloadable; wait for registry availability without resubmitting the same version. Verify the registry's version, integrity and license metadata, then install from the registry in a clean consumer before announcing availability. A successful dry run is not publication or proof of scope ownership.
 
 Publishing a version is an external release and cannot be treated as a disposable verification step. There is deliberately no unattended npm publish command or token in the CI workflow. Follow the current [npm publication documentation](https://docs.npmjs.com/cli/v11/commands/npm-publish/) for registry authentication and access requirements.
+
+## Published 0.1.0 archive
+
+The first publication used the previously reviewed 42-file archive from source commit `ba79bdc`, SHA-256 `057d8e5601bc90d31f6ce4f821d7d7e5c1bddcccebf4a990553970cd519a2f2b`. Preserve this artifact: documentation updates after publication do not replace the immutable registry version. The archive’s documents describe the pre-publication candidate; the repository records the completed release. Release `0.1.0` has no Git tag or GitHub release.
 
 ## Update the demo
 

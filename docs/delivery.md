@@ -134,10 +134,18 @@ GitHub CI run `38366349782` for candidate commit `334860a` was blocked before an
 
 Railway deployment `52dd235b-ee8d-43b8-a2cf-7a438022f533` reached **SUCCESS** on the existing production service. Twenty-two selected browser journeys passed against the public site on Chromium and WebKit iPhone, covering 3.0 JSON import/nullable requests through a controlled intercepted endpoint, 3.0 YAML URL loading, mixed 3.0/3.1 comparisons, responsive layouts, navigation and real Atelier GET/POST. Public pages, health, OpenAPI and products returned HTTP 200; the page references the locally verified production bundle. No new Railway project or service was created.
 
+## npm publication — 13 October 2026
+
+The author created the npm account and `specanto` organization, then enabled 2FA. The CLI authenticated as `sergenyuksel`, and `npm org ls specanto` confirmed the owner role. Interactive web authentication authorized publication of the exact reviewed archive as `@specanto/react@0.1.0` with public access.
+
+Registry version, MIT license, `latest` tag and integrity were verified against the archive. Clean consumers installed version `0.1.0` from the registry with React 18.2 and 19.3; strict TypeScript contracts, runtime exports, the OpenAPI 3.0 parser, Vite builds and exported CSS passed. The registry tarball matches the reviewed artifact. These checks verify registry integration; the candidate’s full unit/browser results remain recorded above.
+
+The immutable archive retains the candidate-era documentation. This repository follow-up documents the completed release without repacking or replacing version `0.1.0`. No credentials were added to the repository, no GitHub release/tag was created and no demo redeployment was required.
+
 ## Distribution and remaining scope
 
-The local archive is `output/specanto-react-0.1.0.tgz`. It contains JS, CSS, TypeScript declarations, the adopted MIT LICENSE and integration/compatibility documentation. The package name is provisional; the manifest is now prepared for public npm publication.
+The local archive is `output/specanto-react-0.1.0.tgz`. It contains JS, CSS, TypeScript declarations, the adopted MIT LICENSE and integration/compatibility documentation. The package is published publicly as `@specanto/react@0.1.0` on npm.
 
-The author approved MIT, OpenAPI 3.0 support and npm publication. Registry publication still requires an npm account, authentication and access to the chosen scope. Advanced JSON Schema validation, external references, OAuth/OIDC, multipart, streaming and multi-API portals remain outside this release. The [compatibility matrix](./compatibility.md) records the current behavior and protection limits.
+The author approved MIT, OpenAPI 3.0 support and npm publication. Registry publication is complete; applications can install with `bun add @specanto/react` independently of the demo deployment. Advanced JSON Schema validation, external references, OAuth/OIDC, multipart, streaming and multi-API portals remain outside this release. The [compatibility matrix](./compatibility.md) records the current behavior and protection limits.
 
-The [roadmap](../ROADMAP.md) records shipped integration options, verification and CI, remaining publication decisions, and the six [delivered feature extensions](./features.md).
+The [roadmap](../ROADMAP.md) records shipped integration options, verification and CI, completed npm distribution, and the six [delivered feature extensions](./features.md).

@@ -1,8 +1,8 @@
 # Specanto roadmap
 
-Status checked against the current code and verification results on 13 October 2026. The functional MVP, integration options and all six proposed feature additions are implemented in the repository. Remaining distribution decisions are listed separately from shipped features.
+Status checked against the current code and verification results on 13 October 2026. The functional MVP, integration options and all six proposed feature additions are implemented in the repository. Public npm distribution is complete; advanced optional features are listed separately.
 
-Verification: 245 unit/integration tests, 118 Chromium/mobile WebKit checks against the production build, and installation/build/runtime checks of the exact MIT candidate archive in React 18.2/19.3 consumers passed.
+Verification: 245 unit/integration tests, 118 Chromium/mobile WebKit checks against the production build, and installation/build/runtime checks of the exact MIT archive and published npm package in React 18.2/19.3 consumers passed.
 
 ## Delivered first slice
 
@@ -36,11 +36,11 @@ Verification: 245 unit/integration tests, 118 Chromium/mobile WebKit checks agai
 ## Priority 4: prepare public package distribution
 
 - [x] Adopt the root MIT LICENSE, SPDX metadata and public publication configuration; the author authorized the release candidate.
-- [ ] Create/authenticate the publisher's npm account and verify access to the chosen package scope. `@specanto/react` is the intended name, pending ownership verification.
+- [x] Authenticate the publisher’s npm account and verify ownership of the `specanto` organization scope.
 - [x] Review dependency/font licenses and prepare any required attribution for distribution.
 - [x] Establish a real private security-reporting channel and update SECURITY.md.
-- [x] README desktop/mobile screenshots and the first unreleased changelog entry.
-- [ ] Publish an explicitly approved package to npm for registry-based Bun/npm/pnpm installation.
+- [x] README desktop/mobile screenshots and the first published changelog entry.
+- [x] Publish `@specanto/react@0.1.0` publicly on npm and verify registry installation with React 18.2 and 19.3.
 
 ## Delivered feature additions
 
