@@ -4,7 +4,7 @@ Specanto affiche un document OpenAPI. Il n’exige ni Swagger UI ni swagger-jsdo
 
 ## 1. Créer l’app locale
 
-La CLI est disponible à partir de la version 0.2.0, actuellement en préparation de publication :
+La CLI est publiée sur npm depuis la version 0.2.0 :
 
 ```sh
 bunx --package @specanto/react@0.2.0 specanto init mooddish-api-docs --api-url http://localhost:3001
@@ -22,7 +22,7 @@ npm install
 npm run dev
 ```
 
-Depuis le checkout Specanto avant publication : `node cli/index.mjs init ../mooddish-api-docs --api-url http://localhost:3001`, puis les mêmes commandes d’installation dans le dossier créé.
+Depuis le checkout Specanto : `node cli/index.mjs init ../mooddish-api-docs --api-url http://localhost:3001`, puis les mêmes commandes d’installation dans le dossier créé.
 
 Ouvrez `http://127.0.0.1:5193`. Utilisez Node 22.12+ pour Vite, ou Bun 1.3.14. Le backend doit tourner séparément. La CLI crée uniquement un dossier nouveau dont le parent existe ; elle ne remplace aucun projet et ne lance ni installation, ni serveur, ni requête API.
 

@@ -53,13 +53,13 @@ Verification: 261 unit/integration tests, 118 Chromium/mobile WebKit checks agai
 
 All six original feature proposals are implemented. Their current behavior and boundaries are described in the [feature overview](./docs/features.md).
 
-## Local Express onboarding — 0.2.0 candidate
+## Local Express onboarding — 0.2.0
 
 - [x] Package the `specanto init` command with Node/Bun support and no new runtime dependencies.
 - [x] Create a separate local Vite app, editable OpenAPI document and fixed-target development proxy, with no automatic dependency installation or backend modification.
 - [x] Refuse existing destinations and malformed API targets; verify the generated app against real Express on Chromium and mobile WebKit.
 - [x] Document Express integration without swagger-jsdoc, Bearer authentication, existing documents and production access controls.
-- [ ] Publish 0.2.0 and verify the same initialization command from npm.
+- [x] Publish 0.2.0 and verify the same initialization command from npm, including the generated app and real Express proxy requests on Chromium and mobile WebKit.
 
 ## Later, optional scope
 

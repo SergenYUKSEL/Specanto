@@ -2,7 +2,7 @@
 
 The checks workflow validates changes. It does not publish a package or deploy infrastructure. npm publication requires an explicit author decision and a usable npm account/scope.
 
-The author approved MIT, OpenAPI 3.0 support and npm publication on 13 October 2026. Version `@specanto/react@0.1.0` is published publicly under MIT. The publisher authenticated as `sergenyuksel`, verified ownership of the `specanto` organization and completed npm’s interactive 2FA flow. Future versions still require candidate review and authenticated publication.
+The author approved MIT, OpenAPI 3.0 support and npm publication on 13 October 2026. Version `@specanto/react@0.2.0` is published publicly under MIT, including the local documentation starter. The publisher authenticated as `sergenyuksel`, verified ownership of the `specanto` organization and completed npm’s interactive 2FA flow. Future versions still require candidate review and authenticated publication.
 
 ## Prepare a candidate
 
@@ -36,6 +36,10 @@ Publishing a version is an external release and cannot be treated as a disposabl
 ## Published 0.1.0 archive
 
 The first publication used the previously reviewed 42-file archive from source commit `ba79bdc`, SHA-256 `057d8e5601bc90d31f6ce4f821d7d7e5c1bddcccebf4a990553970cd519a2f2b`. Preserve this artifact: documentation updates after publication do not replace the immutable registry version. The archive’s documents describe the pre-publication candidate; the repository records the completed release. Release `0.1.0` has no Git tag or GitHub release.
+
+## Published 0.2.0 archive
+
+The starter release uses the reviewed 45-file archive from source commit `de60ac0`, SHA-256 `f40d0dcd84f748d6e17ea7fb5b650fd68e4cc7578d681c6b677437c5fa9d3e54`. Registry version, MIT license, `latest` tag, executable metadata and downloaded bytes were verified. The CLI and generated app were tested again from the registry, including Node/Bun entry points, documented bunx/npx commands, real Express proxy requests on Chromium/WebKit and React 18.2/19.3 consumers. The archive remains unchanged; repository documentation reflects completed publication. No Git tag or GitHub release was created.
 
 ## Update the demo
 

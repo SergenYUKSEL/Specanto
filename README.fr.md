@@ -55,7 +55,7 @@ bun run dev
 
 Avec npm : `npx --package @specanto/react@0.2.0 specanto init mooddish-api-docs --api-url http://localhost:3001`, puis `npm install` et `npm run dev`.
 
-Ouvrez `http://127.0.0.1:5193` et adaptez `public/openapi.json` à vos routes. Le starter fournit un exemple à compléter ; il ne lit pas votre code backend. Son proxy local permet les requêtes manuelles sans modifier le CORS du backend. Aucune dépendance `swagger-jsdoc` ni route `/openapi.json` côté backend n’est nécessaire. Le dossier cible doit être nouveau et son parent doit exister ; la CLI n’installe aucune dépendance automatiquement. La CLI 0.2.0 est en préparation de publication ; depuis ce dépôt, utilisez `node cli/index.mjs init mooddish-api-docs --api-url http://localhost:3001`.
+Ouvrez `http://127.0.0.1:5193` et adaptez `public/openapi.json` à vos routes. Le starter fournit un exemple à compléter ; il ne lit pas votre code backend. Son proxy local permet les requêtes manuelles sans modifier le CORS du backend. Aucune dépendance `swagger-jsdoc` ni route `/openapi.json` côté backend n’est nécessaire. Le dossier cible doit être nouveau et son parent doit exister ; la CLI n’installe aucune dépendance automatiquement. La CLI 0.2.0 est publiée sur npm. Depuis ce dépôt, vous pouvez aussi utiliser `node cli/index.mjs init mooddish-api-docs --api-url http://localhost:3001`.
 
 Le proxy sert au développement local. Le [guide Express](./docs/express.md) explique les schémas, l’authentification Bearer, les documents OpenAPI existants et les accès en production.
 
