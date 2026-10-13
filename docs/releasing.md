@@ -8,7 +8,7 @@ The author approved MIT, OpenAPI 3.0 support and npm publication on 13 October 2
 
 1. Choose and adopt the project license. Confirm the npm package name and the publisher's rights to its scope. A registry 404 only shows that no package was found; it does not establish scope ownership.
 2. Set the intended version in `package.json`, update `CHANGELOG.md` and the compatibility matrix, and refresh dependency/font notices if dependencies changed.
-3. Run `bun install --frozen-lockfile`, `bun run check`, `bun run check:consumer` and `bun run test:e2e`.
+3. Run `bun install --frozen-lockfile`, `bun run check`, `bun run check:consumer`, `bun run check:starter` and `bun run test:e2e`.
 4. Run `bun pm pack --destination output`. Inspect the archive for JS, declarations, styles, README, adopted license and third-party notices; exclude fixtures, credentials and development-only hosts. Install this exact archive in a clean consumer.
 5. Commit and push the reviewed candidate, then inspect CI for that exact commit. If CI cannot start because of provider account/billing restrictions, record the annotation and the complete local verification; do not claim CI passed. Tagging and creating a public release are separate from a routine source push.
 
@@ -23,9 +23,10 @@ For the approved candidate, `private` is removed and `publishConfig` explicitly 
 ```sh
 bun run check
 CI=true bun run test:e2e
-bun pm pack --filename output/specanto-react-0.1.0.tgz
-SPECANTO_CONSUMER_TARBALL="output/specanto-react-0.1.0.tgz" bun run check:consumer
-npm publish ./output/specanto-react-0.1.0.tgz --dry-run --access public --registry https://registry.npmjs.org/
+bun pm pack --filename output/specanto-react-0.2.0.tgz
+SPECANTO_CONSUMER_TARBALL="output/specanto-react-0.2.0.tgz" bun run check:consumer
+SPECANTO_STARTER_TARBALL="output/specanto-react-0.2.0.tgz" bun run check:starter
+npm publish ./output/specanto-react-0.2.0.tgz --dry-run --access public --registry https://registry.npmjs.org/
 ```
 
 Once account/scope access and the candidate are verified, publish that archive with the same command without `--dry-run`. npm may accept the upload before it becomes downloadable; wait for registry availability without resubmitting the same version. Verify the registry's version, integrity and license metadata, then install from the registry in a clean consumer before announcing availability. A successful dry run is not publication or proof of scope ownership.

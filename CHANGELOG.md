@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0 — unreleased
+
+- Added the `specanto init` CLI to create a separate local Vite reference, editable OpenAPI document and fixed-target API proxy without automatic installs or backend changes.
+- Added an Express integration guide without `swagger-jsdoc`, including existing specifications, Bearer authentication and production access considerations.
+- CLI refuses existing destinations and invalid API origins. Node/Bun execution and the packaged starter are verified separately from the React UI.
+
+
 ## 0.1.0 — 13 October 2026
 
 Published publicly on npm as `@specanto/react`.

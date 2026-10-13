@@ -58,7 +58,7 @@ Update the [compatibility matrix](./docs/compatibility.md) when support changes.
 
 ## Package and deployment
 
-`@specanto/react@0.1.0` is published publicly on [npm](https://www.npmjs.com/package/@specanto/react) under MIT. Registry integration uses `bun add @specanto/react`. Local integration uses `bun run build:lib` followed by `bun pm pack --filename specanto-react-0.1.0.tgz`; see the [README](./README.md#install-the-local-react-package).
+`@specanto/react@0.1.0` is published publicly on [npm](https://www.npmjs.com/package/@specanto/react) under MIT. Registry integration uses `bun add @specanto/react`. Local integration uses `bun run build:lib` followed by `bun pm pack --filename specanto-react-0.2.0.tgz`; see the [README](./README.md#install-the-local-react-package).
 
 The public showcase and demo deploy through the Railway CLI to the exact project, environment and selected demo service recorded in the [README](./README.md#deployment). Deployment changes should pass the checks and be followed by a deployment-status and HTTP health check.
 

@@ -28,6 +28,7 @@ jobs:
       - run: bun run check
       - run: bun run check:consumer
       - run: bunx playwright install --with-deps chromium webkit
+      - run: bun run check:starter
       - run: bun run test:e2e
       - run: bun pm pack --destination output
       - name: Keep browser failure evidence

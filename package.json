@@ -1,6 +1,6 @@
 {
   "name": "@specanto/react",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "An expressive, reusable OpenAPI reference for React.",
   "type": "module",
   "packageManager": "bun@1.3.14",
@@ -19,7 +19,9 @@
     "docs/customization.md",
     "docs/releasing.md",
     "docs/features.md",
-    "docs/screenshots"
+    "docs/screenshots",
+    "cli",
+    "docs/express.md"
   ],
   "sideEffects": [
     "**/*.css"
@@ -45,7 +47,8 @@
     "lint": "eslint .",
     "check": "bun run lint && bun run typecheck && bun run test && bun run check:notices && bun run build",
     "check:consumer": "bun run scripts/check-consumer.ts",
-    "check:notices": "bun run scripts/notices.ts --check"
+    "check:notices": "bun run scripts/notices.ts --check",
+    "check:starter": "bun run scripts/check-starter.ts"
   },
   "peerDependencies": {
     "react": ">=18.2.0 <20",
@@ -90,5 +93,8 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
+  },
+  "bin": {
+    "specanto": "./cli/index.mjs"
   }
 }

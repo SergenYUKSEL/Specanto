@@ -142,6 +142,14 @@ Registry version, MIT license, `latest` tag and integrity were verified against 
 
 The immutable archive retains the candidate-era documentation. This repository follow-up documents the completed release without repacking or replacing version `0.1.0`. No credentials were added to the repository, no GitHub release/tag was created and no demo redeployment was required.
 
+## Local Express onboarding — 0.2.0 candidate
+
+The author approved a local starter and Express integration guide after an external integration attempt suggested swagger-jsdoc was required. The optional `specanto init` executable creates a separate Vite React application, an editable OpenAPI file and a fixed-target proxy. It neither scans backend source nor installs dependencies. Existing target directories/symlinks are refused, API origins are validated before filesystem writes, and the generated dev server listens on loopback.
+
+The guide covers manual route descriptions, existing documents, Bearer authentication, relative server resolution, cookie/document-loader limitations and production hosting. No Express dependency was added to the library; the verification runner installs Express 5.3.0 only in its temporary integration host.
+
+Verification: lint, strict TypeScript, notices and both builds passed; 261 unit/integration tests passed. The packaged starter was created through the documented bunx package/bin command, built and exercised against a real Express backend without CORS on Chromium and WebKit iPhone. Manual GET rendered the response; a browser POST verified JSON and Authorization forwarding through the proxy. Initialization itself and initial page load sent no backend recipe request. The fresh production-build reference suite passed all 118 browser checks, and clean React 18.2/19.3 consumers passed strict contracts, runtime exports and CSS/build checks from the 0.2.0 archive. The two starter browser journeys are recorded separately from those 118 checks. npm 0.2.0 publication remains pending the final reviewed archive and interactive npm authentication. Demo runtime assets are unchanged; no Railway deployment is required for this CLI/documentation update.
+
 ## Distribution and remaining scope
 
 The local archive is `output/specanto-react-0.1.0.tgz`. It contains JS, CSS, TypeScript declarations, the adopted MIT LICENSE and integration/compatibility documentation. The package is published publicly as `@specanto/react@0.1.0` on npm.

@@ -8,7 +8,7 @@ Specanto transforme une description OpenAPI en documentation React interactive :
 
 ## État du projet
 
-La version `0.1.0` est publiée sur [npm sous le nom `@specanto/react`](https://www.npmjs.com/package/@specanto/react), sous licence MIT, avec le sous-ensemble documenté d’OpenAPI 3.0.x et 3.1.x. Installez-la dans votre application React, sur votre propre hébergement et avec vos propres API.
+Specanto est distribué sur [npm sous le nom `@specanto/react`](https://www.npmjs.com/package/@specanto/react), sous licence MIT, avec le sous-ensemble documenté d’OpenAPI 3.0.x et 3.1.x. Installez-la dans votre application React, sur votre propre hébergement et avec vos propres API.
 
 La vitrine est disponible sur `/`, la démo sur `/demo` et la comparaison locale OpenAPI sur `/compare`. La démo utilise Atelier, une boutique fictive d’objets design :
 
@@ -42,6 +42,23 @@ PORT=3001 bun run start
 
 La vitrine, la démo et l’API sont alors servies ensemble sur `http://localhost:3001`.
 
+## Créer une documentation locale (CLI à partir de 0.2.0)
+
+Pour un backend Express sur `http://localhost:3001` :
+
+```sh
+bunx --package @specanto/react@0.2.0 specanto init mooddish-api-docs --api-url http://localhost:3001
+cd mooddish-api-docs
+bun install
+bun run dev
+```
+
+Avec npm : `npx --package @specanto/react@0.2.0 specanto init mooddish-api-docs --api-url http://localhost:3001`, puis `npm install` et `npm run dev`.
+
+Ouvrez `http://127.0.0.1:5193` et adaptez `public/openapi.json` à vos routes. Le starter fournit un exemple à compléter ; il ne lit pas votre code backend. Son proxy local permet les requêtes manuelles sans modifier le CORS du backend. Aucune dépendance `swagger-jsdoc` ni route `/openapi.json` côté backend n’est nécessaire. Le dossier cible doit être nouveau et son parent doit exister ; la CLI n’installe aucune dépendance automatiquement. La CLI 0.2.0 est en préparation de publication ; depuis ce dépôt, utilisez `node cli/index.mjs init mooddish-api-docs --api-url http://localhost:3001`.
+
+Le proxy sert au développement local. Le [guide Express](./docs/express.md) explique les schémas, l’authentification Bearer, les documents OpenAPI existants et les accès en production.
+
 ## Installer la bibliothèque dans une application React
 
 Depuis votre application React :
@@ -59,13 +76,13 @@ Pour une installation depuis les sources de ce dépôt, construisez l’archive 
 ```sh
 bun install
 bun run build:lib
-bun pm pack --filename specanto-react-0.1.0.tgz
+bun pm pack --filename specanto-react-0.2.0.tgz
 ```
 
 Depuis votre application React, ajoutez-la avec son chemin réel :
 
 ```sh
-bun add /chemin/absolu/vers/Specanto/specanto-react-0.1.0.tgz
+bun add /chemin/absolu/vers/Specanto/specanto-react-0.2.0.tgz
 ```
 
 Votre application fournit React et React DOM (`>=18.2.0 <20`).
@@ -124,6 +141,8 @@ bun run test:e2e
 
 `check` lance le lint, TypeScript, les tests, la vérification des notices et les deux builds. `check:consumer` vérifie l’archive et les types dans des applications React 18.2 et 19.3 distinctes. Les tests navigateur utilisent Chromium et WebKit mobile : installez-les si nécessaire avec `bunx playwright install chromium webkit`.
 
+`bun run check:starter` vérifie aussi la création d’une app via la CLI empaquetée, son build et les requêtes réelles vers Express via le proxy, sur Chromium et WebKit.
+
 GitHub Actions automatise ces contrôles sur les pushes main et les pull requests. Les tests CI utilisent le build de production. La [procédure de sortie](./docs/releasing.md) garde la publication npm manuelle.
 
 Consultez la [matrice de compatibilité](./docs/compatibility.md) pour les limites OpenAPI, les schémas avancés, l’authentification et la sérialisation.
@@ -141,6 +160,6 @@ Le service est `specanto-demo` (`ac4e2b9e-b881-45bc-b75f-34d4952b9bc1`). Le [REA
 
 ## Licence
 
-Specanto est distribué sous [licence MIT](./LICENSE), qui autorise notamment l’usage commercial, la modification et la redistribution avec conservation des mentions prévues par la licence. La version `0.1.0` est disponible publiquement sur [npm](https://www.npmjs.com/package/@specanto/react).
+Specanto est distribué sous [licence MIT](./LICENSE), qui autorise notamment l’usage commercial, la modification et la redistribution avec conservation des mentions prévues par la licence. Le package est disponible publiquement sur [npm](https://www.npmjs.com/package/@specanto/react).
 
 Les [notices tierces](./THIRD_PARTY_NOTICES.md) conservent les licences des dépendances et des polices de démo. Le [changelog](./CHANGELOG.md) décrit la version publiée.

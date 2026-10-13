@@ -8,7 +8,7 @@ Specanto turns an OpenAPI document into a searchable React reference with a manu
 
 ## Current delivery
 
-Version `0.1.0` is published on [npm as `@specanto/react`](https://www.npmjs.com/package/@specanto/react) under MIT, supporting the documented OpenAPI 3.0.x/3.1.x subset. Install it in your own React application; your application controls its hosting and API destinations.
+Specanto is distributed on [npm as `@specanto/react`](https://www.npmjs.com/package/@specanto/react) under MIT, supporting the documented OpenAPI 3.0.x/3.1.x subset. Install it in your own React application; your application controls its hosting and API destinations.
 
 The repository also contains a showcase at `/`, an interactive demo at `/demo` and a local OpenAPI comparison screen at `/compare`. The demo uses the fictional Atelier shop API, with real HTTP requests:
 
@@ -49,6 +49,23 @@ PORT=3001 bun run start
 
 This serves the showcase, demo, OpenAPI fixture and controlled API together at `http://localhost:3001`. The health endpoint is `/health`.
 
+## Start local documentation (CLI from 0.2.0)
+
+For an Express backend at `http://localhost:3001`, create a separate React app:
+
+```sh
+bunx --package @specanto/react@0.2.0 specanto init mooddish-api-docs --api-url http://localhost:3001
+cd mooddish-api-docs
+bun install
+bun run dev
+```
+
+With npm, use `npx --package @specanto/react@0.2.0 specanto init mooddish-api-docs --api-url http://localhost:3001`, then `npm install` and `npm run dev`.
+
+Open `http://127.0.0.1:5193` and adapt `public/openapi.json` to your actual routes. The starter supplies an editable example, rather than detecting routes in your source. A local proxy sends manual requests to your backend without changing backend CORS. Neither `swagger-jsdoc` nor a backend `/openapi.json` route is required. The target directory must be new; dependencies are installed only when you run the install command. The parent directory must exist. CLI 0.2.0 is being prepared for publication; from this checkout, use `node cli/index.mjs init mooddish-api-docs --api-url http://localhost:3001`.
+
+The proxy is for local development. See the [Express guide](./docs/express.md) for route schemas, Bearer authentication, existing OpenAPI documents and production access controls.
+
 ## Install the React package
 
 From your React application:
@@ -68,13 +85,13 @@ Build and pack from this repository:
 ```sh
 bun install
 bun run build:lib
-bun pm pack --filename specanto-react-0.1.0.tgz
+bun pm pack --filename specanto-react-0.2.0.tgz
 ```
 
 Then, from your React application, install the generated archive using its actual path:
 
 ```sh
-bun add /absolute/path/to/Specanto/specanto-react-0.1.0.tgz
+bun add /absolute/path/to/Specanto/specanto-react-0.2.0.tgz
 ```
 
 React and React DOM are peer dependencies (`>=18.2.0 <20`). Your application supplies them. The package contains an ES module, TypeScript declarations and an explicit CSS export.
@@ -146,7 +163,7 @@ bun run check:consumer
 bun run test:e2e
 ```
 
-`check` runs lint, TypeScript checks, unit tests, third-party notice verification and both builds. `check:consumer` installs the archive in separate React 18.2 and 19.3 consumers, then verifies strict TypeScript, public JS/CSS exports and builds. Browser checks run Chromium and mobile WebKit against the demo and an isolated integration host. Install the browsers if missing with `bunx playwright install chromium webkit`.
+`check` runs lint, TypeScript checks, unit tests, third-party notice verification and both builds. `check:consumer` installs the archive in separate React 18.2 and 19.3 consumers, then verifies strict TypeScript, public JS/CSS exports and builds. `check:starter` also creates a reference through the packaged CLI, builds it and tests real Express proxy requests on Chromium and WebKit. Browser checks run Chromium and mobile WebKit against the demo and an isolated integration host. Install the browsers if missing with `bunx playwright install chromium webkit`.
 
 GitHub Actions runs these checks for main pushes and pull requests. In CI, browser tests use the production demo build. See the [manual release procedure](./docs/releasing.md); the workflow does not publish npm packages.
 
@@ -181,6 +198,6 @@ SPECANTO_TEST_URL=http://localhost:3000 bun run test:e2e
 
 ## Licenses and release status
 
-Specanto is licensed under [MIT](./LICENSE). Commercial use, modification and redistribution are permitted subject to the license's notice requirements. Version `0.1.0` is publicly available on [npm](https://www.npmjs.com/package/@specanto/react).
+Specanto is licensed under [MIT](./LICENSE). Commercial use, modification and redistribution are permitted subject to the license's notice requirements. The package is publicly available on [npm](https://www.npmjs.com/package/@specanto/react).
 
 [Third-party notices](./THIRD_PARTY_NOTICES.md) preserve dependency and demo font licenses. [Changelog](./CHANGELOG.md) records the published version.

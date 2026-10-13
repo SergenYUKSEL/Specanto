@@ -8,7 +8,7 @@ From the repository root, create the archive:
 bun install
 bun run build:lib
 mkdir -p output
-bun pm pack --filename output/specanto-react-0.1.0.tgz
+bun pm pack --filename output/specanto-react-0.2.0.tgz
 ```
 
 Then run this application:

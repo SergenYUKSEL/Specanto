@@ -2,7 +2,7 @@
 
 Status checked against the current code and verification results on 13 October 2026. The functional MVP, integration options and all six proposed feature additions are implemented in the repository. Public npm distribution is complete; advanced optional features are listed separately.
 
-Verification: 245 unit/integration tests, 118 Chromium/mobile WebKit checks against the production build, and installation/build/runtime checks of the exact MIT archive and published npm package in React 18.2/19.3 consumers passed.
+Verification: 261 unit/integration tests, 118 Chromium/mobile WebKit checks against the production build, and installation/build/runtime checks of the exact MIT archive and published npm package in React 18.2/19.3 consumers passed.
 
 ## Delivered first slice
 
@@ -12,7 +12,7 @@ Verification: 245 unit/integration tests, 118 Chromium/mobile WebKit checks agai
 - [x] Bearer and API-key header construction, memory-only credentials, origin binding and redacted cURL.
 - [x] Responsive operation screen, light/dark themes and SVG icons.
 - [x] Fictional Atelier API, stateless demo server, public showcase and Railway CLI deployment.
-- [x] 245 unit/integration tests, 118 Chromium/mobile WebKit checks, and React 18.2/19.3 consumers with strict TypeScript contracts verified from the exact candidate archive.
+- [x] 261 unit/integration tests, 118 Chromium/mobile WebKit checks, and React 18.2/19.3 consumers with strict TypeScript contracts verified from the exact candidate archive.
 
 ## Priority 1: finish the MVP integration options
 
@@ -52,6 +52,14 @@ Verification: 245 unit/integration tests, 118 Chromium/mobile WebKit checks agai
 - [x] Configurable French/English interface, known validation diagnostics, session controls and comparison screen, while preserving the language of OpenAPI-authored content.
 
 All six original feature proposals are implemented. Their current behavior and boundaries are described in the [feature overview](./docs/features.md).
+
+## Local Express onboarding — 0.2.0 candidate
+
+- [x] Package the `specanto init` command with Node/Bun support and no new runtime dependencies.
+- [x] Create a separate local Vite app, editable OpenAPI document and fixed-target development proxy, with no automatic dependency installation or backend modification.
+- [x] Refuse existing destinations and malformed API targets; verify the generated app against real Express on Chromium and mobile WebKit.
+- [x] Document Express integration without swagger-jsdoc, Bearer authentication, existing documents and production access controls.
+- [ ] Publish 0.2.0 and verify the same initialization command from npm.
 
 ## Later, optional scope
 
